@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.selfward.app",
+      "sha256_cert_fingerprints": [
+        "C5:BC:9B:54:A2:EE:02:82:BE:19:3B:FB:77:C7:1D:59:CD:BD:78:11:A0:74:EE:69:09:4D:3C:F8:19:F3:DB:B9"
+      ]
+    }
+  }
+]

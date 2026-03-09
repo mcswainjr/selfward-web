@@ -1,29 +1,21 @@
-export default function Home() {
+type SharePageProps = {
+  params: Promise<{
+    shareId: string;
+  }>;
+};
+
+export default async function SharePage({ params }: SharePageProps) {
+  const { shareId } = await params;
+
   return (
-    <main style={{
-      height: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexDirection: "column",
-      fontFamily: "system-ui"
-    }}>
-      <h1 style={{fontSize: "40px", marginBottom: "10px"}}>
-        Selfward
-      </h1>
+    <main style={{ padding: "48px", fontFamily: "Arial, sans-serif" }}>
+      <h1>Open in Selfward</h1>
+      <p>Share ID: {shareId}</p>
+      <p>If the app is installed, this link should open Selfward.</p>
+      <p>If not, this page can become your fallback experience.</p>
 
-      <p style={{fontSize: "18px", opacity: 0.7}}>
-        What you need to hear, when you need it most.
-      </p>
-
-      <div style={{marginTop: "30px"}}>
-        <a href="#" style={{marginRight: "20px"}}>
-          Download on App Store
-        </a>
-
-        <a href="#">
-          Get it on Google Play
-        </a>
+      <div style={{ marginTop: "24px" }}>
+        <a href={`selfward://s/${shareId}`}>Try opening the app</a>
       </div>
     </main>
   );

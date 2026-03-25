@@ -50,7 +50,7 @@ if (
   };
 
   return (
-    <div className="mt-6 w-full max-w-md">
+    <div className="mt-6 w-full flex flex-col items-center">        
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -58,13 +58,13 @@ if (
       />
 
       <button
-        onClick={handlePlayPause}
-        className="w-full rounded-full bg-green-500 py-4 text-black font-semibold text-lg"
-      >
+          onClick={handlePlayPause}
+          className="w-full max-w-sm rounded-full bg-green-500 py-4 text-black font-semibold text-lg"
+      >        
         {isPlaying ? "Pause" : "Play"}
       </button>
 
-      <div className="mt-3 h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+       <div className="mt-3 h-2 w-full max-w-sm bg-gray-700 rounded-full overflow-hidden">        
         <div
           className="h-full bg-green-400 transition-all"
           style={{ width: `${progress * 100}%` }}
@@ -72,7 +72,7 @@ if (
       </div>
 
       {showCTA && (
-        <div className="mt-6 text-center">
+       <div className="mt-6 w-full max-w-sm text-center">            
           <p className="text-lg font-semibold">
             Keep listening in Selfward
           </p>
@@ -82,9 +82,9 @@ if (
 
           <a
             href="selfward://"
-            className="block mt-4 rounded-full bg-green-500 py-4 text-black font-semibold text-lg"
-          >
-            Open in Selfward
+            className="block w-full rounded-full bg-green-500 py-4 text-black font-semibold text-lg"
+          >            
+Open in Selfward
           </a>
 
           {/* NEW secondary CTA */}

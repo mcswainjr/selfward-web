@@ -92,30 +92,21 @@ export default async function Page({ params }: PageProps) {
     ? `${senderName} thought you needed to hear this.`
     : "Someone thought you needed to hear this.";
 
-return (
-  <div className="min-h-screen flex items-center justify-center bg-black text-white px-6">
-    
-    <div className="w-full max-w-md text-center">
-      
-      <p className="text-xs tracking-widest text-gray-400 mb-4">
-        SHARED BOOST
-      </p>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-black text-white px-6">
+      <div className="w-full max-w-md text-center space-y-2">
+        <p className="text-xs tracking-widest text-gray-400">SHARED BOOST</p>
 
-      <h1 className="text-2xl font-bold mb-2">
-        {share.sender_name_snapshot} thought you needed to hear this.
-      </h1>
+        <h1 className="text-2xl font-bold">{heading}</h1>
 
-      <p className="text-gray-400 mb-1">
-        {content.title}
-      </p>
+        <p className="text-gray-400">{content.title}</p>
 
-      <p className="text-sm text-gray-500 mb-6">
-        Press play to preview this boost.
-      </p>
+        <p className="text-sm text-gray-500">
+          Press play to preview this boost.
+        </p>
 
-      <SharePlayer audioUrl={content.audio_url} />
-
+        <SharePlayer audioUrl={content.audio_url} />
+      </div>
     </div>
-  </div>
-);  
+  );
 }

@@ -1,4 +1,4 @@
-import SharePlayer from "@/components/SharePlayer";
+import SharePlayer from "../../components/SharePlayer";
 
 export default async function Page({ params }: any) {
   const { shareId } = params;

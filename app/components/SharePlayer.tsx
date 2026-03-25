@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useRef, useState } from "react";
 
 type Props = {
@@ -23,14 +24,17 @@ export default function SharePlayer({ audioUrl }: Props) {
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
+      posthog.capture("share_preview_paused");
       return;
     }
 
     try {
       await audio.play();
       setIsPlaying(true);
+      posthog.capture("share_preview_play_clicked");
     } catch (err) {
       console.error("Audio play failed:", err);
+      posthog.capture("share_preview_play_failed");
     }
   };
 
@@ -48,6 +52,7 @@ export default function SharePlayer({ audioUrl }: Props) {
       audio.pause();
       setIsPlaying(false);
       setShowCTA(true);
+      posthog.capture("share_preview_cutoff_reached");
     }
   };
 
@@ -55,6 +60,7 @@ export default function SharePlayer({ audioUrl }: Props) {
     setIsPlaying(false);
     setProgress(1);
     setShowCTA(true);
+    posthog.capture("share_preview_completed");
   };
 
   return (
@@ -89,12 +95,17 @@ export default function SharePlayer({ audioUrl }: Props) {
 
           <a
             href="selfward://"
+            onClick={() => posthog.capture("share_open_in_selfward_clicked")}
             className="block w-full mt-4 rounded-full bg-emerald-500 py-4 text-black font-semibold text-lg"
           >
             Open in Selfward
           </a>
 
-          <a href="/" className="block mt-3 text-sm text-gray-400 underline">
+          <a
+            href="/"
+            onClick={() => posthog.capture("share_get_first_boost_clicked")}
+            className="block mt-3 text-sm text-gray-400 underline"
+          >
             Get your first boost
           </a>
         </div>

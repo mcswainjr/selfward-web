@@ -1,11 +1,11 @@
 type SharePageProps = {
-  params: Promise<{
+  params: {
     shareId: string;
-  }>;
+  };
 };
 
 export default async function SharePage({ params }: SharePageProps) {
-  const { shareId } = await params;
+  const { shareId } =  params;
 
   return (
     <main

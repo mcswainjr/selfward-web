@@ -20,13 +20,12 @@ export default function Home() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="/s/sample"
+        <button
+            onClick={() => alert("Selfward is launching soon. Stay tuned.")}
             className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold py-3 px-6 rounded-full transition"
           >
             Get your first boost
-          </a>
-
+            </button>
           <a
             href="/privacy"
             className="border border-white/20 hover:bg-white/10 py-3 px-6 rounded-full transition"

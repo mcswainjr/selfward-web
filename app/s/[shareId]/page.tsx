@@ -1,13 +1,13 @@
 import SharePlayer from "../../components/SharePlayer";
 
 type PageProps = {
-  params: {
+  params: Promise<{
     shareId: string;
-  };
+  }>;
 };
 
 export default async function Page({ params }: PageProps) {
-  const { shareId } = params;
+  const { shareId } = await params;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -20,14 +20,15 @@ export default async function Page({ params }: PageProps) {
     );
   }
 
-  // 1. Fetch share link
+  const headers = {
+    apikey: supabaseAnonKey,
+    Authorization: `Bearer ${supabaseAnonKey}`,
+  };
+
   const shareRes = await fetch(
     `${supabaseUrl}/rest/v1/share_links?id=eq.${shareId}&select=*`,
     {
-      headers: {
-        apikey: supabaseAnonKey,
-        Authorization: `Bearer ${supabaseAnonKey}`,
-      },
+      headers,
       cache: "no-store",
     }
   );
@@ -55,14 +56,10 @@ export default async function Page({ params }: PageProps) {
     );
   }
 
-  // 2. Fetch content
   const contentRes = await fetch(
     `${supabaseUrl}/rest/v1/content?id=eq.${share.content_id}&select=title,audio_url`,
     {
-      headers: {
-        apikey: supabaseAnonKey,
-        Authorization: `Bearer ${supabaseAnonKey}`,
-      },
+      headers,
       cache: "no-store",
     }
   );
@@ -102,7 +99,7 @@ export default async function Page({ params }: PageProps) {
           Shared Boost
         </p>
 
-        <h1 className="text-3xl font-bold text-center">{heading}</h1>
+        <h1 className="text-3xl font-bold">{heading}</h1>
 
         {!!content.title && (
           <p className="mt-3 text-gray-400 text-base">{content.title}</p>

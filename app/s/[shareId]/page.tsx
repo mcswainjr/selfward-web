@@ -1,132 +1,45 @@
-type SharePageProps = {
-  params: {
-    shareId: string;
-  };
-};
+import SharePlayer from "@/components/SharePlayer";
 
-export default async function SharePage({ params }: SharePageProps) {
-  const { shareId } =  params;
+export default async function Page({ params }: any) {
+  const { shareId } = params;
+
+  // 1. Fetch share link
+  const shareRes = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/share_links?id=eq.${shareId}`,
+    {
+      headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      },
+    }
+  );
+
+  const shareData = await shareRes.json();
+  const share = shareData[0];
+
+  if (!share) return <div>Not found</div>;
+
+  // 2. Fetch content
+  const contentRes = await fetch(
+    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/content?id=eq.${share.content_id}`,
+    {
+      headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      },
+    }
+  );
+
+  const contentData = await contentRes.json();
+  const content = contentData[0];
+
+  if (!content?.audio_url) return <div>No audio</div>;
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#020617",
-        color: "#F9FAFB",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        padding: "32px 20px",
-        fontFamily: "system-ui, sans-serif",
-      }}
-    >
-      {/* Top Content */}
-      <div style={{ maxWidth: 420, margin: "0 auto", width: "100%" }}>
-        <p
-          style={{
-            fontSize: 12,
-            color: "#9CA3AF",
-            fontWeight: 800,
-            letterSpacing: 1,
-            textTransform: "uppercase",
-            marginBottom: 12,
-          }}
-        >
-          Shared Boost
-        </p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-6">
+      <h1 className="text-2xl font-bold text-center">
+        Someone thought you needed to hear this.
+      </h1>
 
-        <h1
-          style={{
-            fontSize: 28,
-            fontWeight: 900,
-            lineHeight: "36px",
-          }}
-        >
-          Someone thought you needed to hear this.
-        </h1>
-
-        <p
-          style={{
-            marginTop: 16,
-            color: "#9CA3AF",
-            fontSize: 15,
-            lineHeight: "22px",
-          }}
-        >
-          Selfward gives you personalized audio boosts based on how you’re
-          feeling — whether you need a reset, a push, or something grounding in
-          the moment.
-        </p>
-
-        {/* Bullet Points */}
-        <div
-          style={{
-            marginTop: 20,
-            paddingTop: 16,
-            borderTop: "1px solid #111827",
-          }}
-        >
-          <p style={bullet}>• Personalized to your mood</p>
-          <p style={bullet}>• Quick reset or deeper push</p>
-          <p style={bullet}>• Real growth, no noise</p>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div style={{ maxWidth: 420, margin: "0 auto", width: "100%" }}>
-        {/* Open App */}
-        <a
-          href={`selfward://s/${shareId}`}
-          style={{
-            display: "block",
-            textAlign: "center",
-            backgroundColor: "#10B981",
-            padding: "14px",
-            borderRadius: 999,
-            fontWeight: 900,
-            color: "#052e2b",
-            textDecoration: "none",
-          }}
-        >
-          Open in Selfward
-        </a>
-
-        {/* Secondary CTA */}
-        <a
-          href="/"
-          style={{
-            display: "block",
-            textAlign: "center",
-            marginTop: 16,
-            color: "#9CA3AF",
-            fontSize: 13,
-            fontWeight: 700,
-            textDecoration: "none",
-          }}
-        >
-          Get your first boost
-        </a>
-
-        {/* Footer note */}
-        <p
-          style={{
-            marginTop: 16,
-            fontSize: 12,
-            color: "#6B7280",
-            textAlign: "center",
-          }}
-        >
-          Share ID: {shareId}
-        </p>
-      </div>
-    </main>
+      <SharePlayer audioUrl={content.audio_url} />
+    </div>
   );
 }
-
-const bullet = {
-  color: "#D1D5DB",
-  fontSize: 13,
-  lineHeight: "20px",
-  marginTop: 6,
-  fontWeight: 700,
-};

@@ -6,9 +6,16 @@ import { useRef, useState } from "react";
 type Props = {
   audioUrl: string;
   appDeepLink: string;
+  shareId: string;
+  senderName: string | null;
 };
 
-export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
+export default function SharePlayer({
+  audioUrl,
+  appDeepLink,
+  shareId,
+  senderName,
+}: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -18,6 +25,12 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
   const PREVIEW_LIMIT = 8;
   const SHORT_AUDIO_THRESHOLD = 10;
 
+  const baseProps = {
+    audio_url: audioUrl,
+    share_id: shareId,
+    sender_name: senderName ?? "unknown",
+  };
+
   const handlePlayPause = async () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -25,23 +38,17 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
-      posthog.capture("share_preview_paused", {
-        audio_url: audioUrl,
-      });
+      posthog.capture("share_preview_paused", baseProps);
       return;
     }
 
     try {
       await audio.play();
       setIsPlaying(true);
-      posthog.capture("share_preview_play_clicked", {
-        audio_url: audioUrl,
-      });
+      posthog.capture("share_preview_play_clicked", baseProps);
     } catch (err) {
       console.error("Audio play failed:", err);
-      posthog.capture("share_preview_play_failed", {
-        audio_url: audioUrl,
-      });
+      posthog.capture("share_preview_play_failed", baseProps);
     }
   };
 
@@ -60,7 +67,8 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
       setIsPlaying(false);
       setShowCTA(true);
       posthog.capture("share_preview_cutoff_reached", {
-        audio_url: audioUrl,
+        ...baseProps,
+        preview_limit_seconds: PREVIEW_LIMIT,
       });
     }
   };
@@ -69,9 +77,7 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
     setIsPlaying(false);
     setProgress(1);
     setShowCTA(true);
-    posthog.capture("share_preview_completed", {
-      audio_url: audioUrl,
-    });
+    posthog.capture("share_preview_completed", baseProps);
   };
 
   const handleOpenInSelfward = (
@@ -80,8 +86,9 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
     e.preventDefault();
 
     posthog.capture("share_open_in_selfward_clicked", {
-      audio_url: audioUrl,
+      ...baseProps,
       app_deep_link: appDeepLink,
+      test_marker: new Date().toISOString(),
     });
 
     setTimeout(() => {
@@ -131,7 +138,8 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
             href="/coming-soon"
             onClick={() =>
               posthog.capture("share_get_first_boost_clicked", {
-                audio_url: audioUrl,
+                ...baseProps,
+                test_marker: new Date().toISOString(),
               })
             }
             className="block mt-3 text-sm text-gray-400 underline"

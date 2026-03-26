@@ -110,6 +110,8 @@ export default async function Page({ params }: PageProps) {
         <SharePlayer
           audioUrl={content.audio_url}
           appDeepLink={appDeepLink}
+          shareId={shareId}
+          senderName={senderName}
         />
       </div>
     </div>

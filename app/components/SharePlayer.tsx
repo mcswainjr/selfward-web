@@ -32,10 +32,14 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
     try {
       await audio.play();
       setIsPlaying(true);
-      posthog.capture("share_preview_play_clicked");
+      posthog.capture("share_preview_play_clicked", {
+        audio_url: audioUrl,
+      });
     } catch (err) {
       console.error("Audio play failed:", err);
-      posthog.capture("share_preview_play_failed");
+      posthog.capture("share_preview_play_failed", {
+        audio_url: audioUrl,
+      });
     }
   };
 
@@ -53,7 +57,9 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
       audio.pause();
       setIsPlaying(false);
       setShowCTA(true);
-      posthog.capture("share_preview_cutoff_reached");
+      posthog.capture("share_preview_cutoff_reached", {
+        audio_url: audioUrl,
+      });
     }
   };
 
@@ -61,7 +67,28 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
     setIsPlaying(false);
     setProgress(1);
     setShowCTA(true);
-    posthog.capture("share_preview_completed");
+    posthog.capture("share_preview_completed", {
+      audio_url: audioUrl,
+    });
+  };
+
+  const handleOpenInSelfward = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+
+    posthog.capture(
+      "share_open_in_selfward_clicked",
+      {
+        audio_url: audioUrl,
+        app_deep_link: appDeepLink,
+      },
+      () => {
+        window.location.href = appDeepLink;
+      }
+    );
+
+    setTimeout(() => {
+      window.location.href = appDeepLink;
+    }, 300);
   };
 
   return (
@@ -96,20 +123,19 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
 
           <a
             href={appDeepLink}
-            onClick={() =>
-              posthog.capture("share_open_in_selfward_clicked", {
-                audio_url: audioUrl,
-                app_deep_link: appDeepLink,
-              })
-            }
+            onClick={handleOpenInSelfward}
             className="block w-full mt-4 rounded-full bg-emerald-500 py-4 text-black font-semibold text-lg"
           >
             Open in Selfward
           </a>
 
           <a
-            href="/"
-            onClick={() => posthog.capture("share_get_first_boost_clicked")}
+            href="/coming-soon"
+            onClick={() =>
+              posthog.capture("share_get_first_boost_clicked", {
+                audio_url: audioUrl,
+              })
+            }
             className="block mt-3 text-sm text-gray-400 underline"
           >
             Get your first boost

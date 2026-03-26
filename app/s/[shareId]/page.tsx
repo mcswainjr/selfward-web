@@ -57,7 +57,7 @@ export default async function Page({ params }: PageProps) {
   }
 
   const contentRes = await fetch(
-    `${supabaseUrl}/rest/v1/content?id=eq.${share.content_id}&select=title,audio_url`,
+    `${supabaseUrl}/rest/v1/content?id=eq.${share.content_id}&select=title,audio_url,content_type`,
     {
       headers,
       cache: "no-store",
@@ -111,6 +111,7 @@ export default async function Page({ params }: PageProps) {
           audioUrl={content.audio_url}
           appDeepLink={appDeepLink}
           shareId={shareId}
+          contentType={content.content_type}
         />
       </div>
     </div>

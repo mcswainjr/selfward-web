@@ -7,12 +7,14 @@ type Props = {
   audioUrl: string;
   appDeepLink: string;
   shareId: string;
+  contentType?: string | null;
 };
 
 export default function SharePlayer({
   audioUrl,
   appDeepLink,
   shareId,
+  contentType,
 }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -20,12 +22,28 @@ export default function SharePlayer({
   const [progress, setProgress] = useState(0);
   const [showCTA, setShowCTA] = useState(false);
 
-  const PREVIEW_LIMIT = 8;
   const SHORT_AUDIO_THRESHOLD = 10;
+
+  const getPreviewLimit = (type?: string | null) => {
+    switch (type) {
+      case "affirmation":
+        return 8;
+      case "story":
+        return 45;
+      case "meditation":
+        return 30;
+      default:
+        return 8;
+    }
+  };
+
+  const PREVIEW_LIMIT = getPreviewLimit(contentType);
 
   const baseProps = {
     audio_url: audioUrl,
     share_id: shareId,
+    content_type: contentType ?? "unknown",
+    preview_limit_seconds: PREVIEW_LIMIT,
   };
 
   const handlePlayPause = async () => {
@@ -63,10 +81,7 @@ export default function SharePlayer({
       audio.pause();
       setIsPlaying(false);
       setShowCTA(true);
-      posthog.capture("share_preview_cutoff_reached", {
-        ...baseProps,
-        preview_limit_seconds: PREVIEW_LIMIT,
-      });
+      posthog.capture("share_preview_cutoff_reached", baseProps);
     }
   };
 

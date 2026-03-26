@@ -92,6 +92,8 @@ export default async function Page({ params }: PageProps) {
     ? `${senderName} thought you needed to hear this.`
     : "Someone thought you needed to hear this.";
 
+  const appDeepLink = `selfward://s/${shareId}`;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white px-6">
       <div className="w-full max-w-md text-center space-y-2">
@@ -105,7 +107,10 @@ export default async function Page({ params }: PageProps) {
           Press play to preview this boost.
         </p>
 
-        <SharePlayer audioUrl={content.audio_url} />
+        <SharePlayer
+          audioUrl={content.audio_url}
+          appDeepLink={appDeepLink}
+        />
       </div>
     </div>
   );

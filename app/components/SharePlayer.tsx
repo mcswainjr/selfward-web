@@ -5,9 +5,10 @@ import { useRef, useState } from "react";
 
 type Props = {
   audioUrl: string;
+  appDeepLink: string;
 };
 
-export default function SharePlayer({ audioUrl }: Props) {
+export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -93,17 +94,19 @@ export default function SharePlayer({ audioUrl }: Props) {
             Get the full experience and personalized audio.
           </p>
 
-<a
-  href="selfward://"
-  onClick={() => {
-    posthog.capture("share_open_in_selfward_clicked", {
-      audio_url: audioUrl,
-    });
-  }}
-  className="block w-full mt-4 rounded-full bg-emerald-500 py-4 text-black font-semibold text-lg"
->
-  Open in Selfward
-</a>
+          <a
+            href={appDeepLink}
+            onClick={() =>
+              posthog.capture("share_open_in_selfward_clicked", {
+                audio_url: audioUrl,
+                app_deep_link: appDeepLink,
+              })
+            }
+            className="block w-full mt-4 rounded-full bg-emerald-500 py-4 text-black font-semibold text-lg"
+          >
+            Open in Selfward
+          </a>
+
           <a
             href="/"
             onClick={() => posthog.capture("share_get_first_boost_clicked")}

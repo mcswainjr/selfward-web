@@ -25,7 +25,9 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
-      posthog.capture("share_preview_paused");
+      posthog.capture("share_preview_paused", {
+        audio_url: audioUrl,
+      });
       return;
     }
 
@@ -72,23 +74,19 @@ export default function SharePlayer({ audioUrl, appDeepLink }: Props) {
     });
   };
 
-  const handleOpenInSelfward = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleOpenInSelfward = (
+    e: React.MouseEvent<HTMLAnchorElement>
+  ) => {
     e.preventDefault();
 
-    posthog.capture(
-      "share_open_in_selfward_clicked",
-      {
-        audio_url: audioUrl,
-        app_deep_link: appDeepLink,
-      },
-      () => {
-        window.location.href = appDeepLink;
-      }
-    );
+    posthog.capture("share_open_in_selfward_clicked", {
+      audio_url: audioUrl,
+      app_deep_link: appDeepLink,
+    });
 
     setTimeout(() => {
       window.location.href = appDeepLink;
-    }, 300);
+    }, 250);
   };
 
   return (

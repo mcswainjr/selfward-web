@@ -8,6 +8,8 @@ type Props = {
   appDeepLink: string;
   shareId: string;
   contentType?: string | null;
+  previewStartSec?: number | null;
+  previewEndSec?: number | null;
 };
 
 export default function SharePlayer({
@@ -15,6 +17,8 @@ export default function SharePlayer({
   appDeepLink,
   shareId,
   contentType,
+  previewStartSec,
+  previewEndSec,
 }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -24,26 +28,48 @@ export default function SharePlayer({
 
   const SHORT_AUDIO_THRESHOLD = 10;
 
-  const getPreviewLimit = (type?: string | null) => {
+  const getDefaultPreviewStart = (type?: string | null) => {
+    switch (type) {
+      case "affirmation":
+      case "story":
+      case "meditation":
+      default:
+        return 0;
+    }
+  };
+
+  const getDefaultPreviewEnd = (type?: string | null) => {
     switch (type) {
       case "affirmation":
         return 8;
       case "story":
-        return 45;
-      case "meditation":
         return 30;
+      case "meditation":
+        return 40;
       default:
         return 8;
     }
   };
 
-  const PREVIEW_LIMIT = getPreviewLimit(contentType);
+  const resolvedPreviewStart =
+    typeof previewStartSec === "number"
+      ? previewStartSec
+      : getDefaultPreviewStart(contentType);
+
+  const resolvedPreviewEnd =
+    typeof previewEndSec === "number"
+      ? previewEndSec
+      : getDefaultPreviewEnd(contentType);
+
+  const safePreviewStart = Math.max(resolvedPreviewStart, 0);
+  const safePreviewEnd = Math.max(resolvedPreviewEnd, safePreviewStart + 1);
 
   const baseProps = {
     audio_url: audioUrl,
     share_id: shareId,
     content_type: contentType ?? "unknown",
-    preview_limit_seconds: PREVIEW_LIMIT,
+    preview_start_seconds: safePreviewStart,
+    preview_end_seconds: safePreviewEnd,
   };
 
   const handlePlayPause = async () => {
@@ -58,6 +84,10 @@ export default function SharePlayer({
     }
 
     try {
+      if (safePreviewStart > 0 && audio.currentTime < safePreviewStart) {
+        audio.currentTime = safePreviewStart;
+      }
+
       await audio.play();
       setIsPlaying(true);
       posthog.capture("share_preview_play_clicked", baseProps);
@@ -71,16 +101,22 @@ export default function SharePlayer({
     const audio = audioRef.current;
     if (!audio) return;
 
-    const duration = audio.duration || 1;
-    setProgress(audio.currentTime / duration);
+    const previewLength = Math.max(safePreviewEnd - safePreviewStart, 1);
+    const previewProgress = Math.min(
+      Math.max((audio.currentTime - safePreviewStart) / previewLength, 0),
+      1
+    );
+
+    setProgress(previewProgress);
 
     if (
       audio.duration > SHORT_AUDIO_THRESHOLD &&
-      audio.currentTime >= PREVIEW_LIMIT
+      audio.currentTime >= safePreviewEnd
     ) {
       audio.pause();
       setIsPlaying(false);
       setShowCTA(true);
+      setProgress(1);
       posthog.capture("share_preview_cutoff_reached", baseProps);
     }
   };

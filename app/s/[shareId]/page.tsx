@@ -57,12 +57,12 @@ export default async function Page({ params }: PageProps) {
   }
 
   const contentRes = await fetch(
-    `${supabaseUrl}/rest/v1/content?id=eq.${share.content_id}&select=title,audio_url,content_type`,
-    {
-      headers,
-      cache: "no-store",
-    }
-  );
+  `${supabaseUrl}/rest/v1/content?id=eq.${share.content_id}&select=title,audio_url,content_type,share_preview_start_sec,share_preview_end_sec`,
+  {
+    headers,
+    cache: "no-store",
+  }
+);
 
   const contentData = await contentRes.json();
 
@@ -107,12 +107,15 @@ export default async function Page({ params }: PageProps) {
           Press play to preview this boost.
         </p>
 
-        <SharePlayer
-          audioUrl={content.audio_url}
-          appDeepLink={appDeepLink}
-          shareId={shareId}
-          contentType={content.content_type}
-        />
+      <SharePlayer
+        audioUrl={content.audio_url}
+        appDeepLink={appDeepLink}
+        shareId={shareId}
+        contentType={content.content_type}
+        previewStartSec={content.share_preview_start_sec}
+        previewEndSec={content.share_preview_end_sec}
+    />
+
       </div>
     </div>
   );

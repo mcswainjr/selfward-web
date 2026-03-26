@@ -7,14 +7,12 @@ type Props = {
   audioUrl: string;
   appDeepLink: string;
   shareId: string;
-  senderName: string | null;
 };
 
 export default function SharePlayer({
   audioUrl,
   appDeepLink,
   shareId,
-  senderName,
 }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -28,7 +26,6 @@ export default function SharePlayer({
   const baseProps = {
     audio_url: audioUrl,
     share_id: shareId,
-    sender_name: senderName ?? "unknown",
   };
 
   const handlePlayPause = async () => {
@@ -88,12 +85,11 @@ export default function SharePlayer({
     posthog.capture("share_open_in_selfward_clicked", {
       ...baseProps,
       app_deep_link: appDeepLink,
-      test_marker: new Date().toISOString(),
     });
 
     setTimeout(() => {
       window.location.href = appDeepLink;
-    }, 250);
+    }, 800);
   };
 
   return (
@@ -137,10 +133,7 @@ export default function SharePlayer({
           <a
             href="/coming-soon"
             onClick={() =>
-              posthog.capture("share_get_first_boost_clicked", {
-                ...baseProps,
-                test_marker: new Date().toISOString(),
-              })
+              posthog.capture("share_get_first_boost_clicked", baseProps)
             }
             className="block mt-3 text-sm text-gray-400 underline"
           >

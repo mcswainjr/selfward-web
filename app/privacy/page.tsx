@@ -113,8 +113,8 @@ export default function PrivacyPage() {
           </p>
           <p style={bodyStyle}>
             You can manage account deletion in the app or here:{" "}
-            <a href="https://delete.selfward.app/delete-account" style={linkStyle}>
-              delete.selfward.app/delete-account
+            <a href="https://selfward.app/delete-account" style={linkStyle}>
+              selfward.app/delete-account
             </a>
           </p>
         </section>

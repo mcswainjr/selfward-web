@@ -62,7 +62,7 @@ export default function TermsPage() {
           <h2 style={heading}>Account deletion</h2>
           <p style={text}>
             You can delete your account at any time in the app or by visiting{" "}
-            <a href="https://delete.selfward.app/delete-account" style={link}>
+            <a href="https://seflward.app/delete-account" style={link}>
               delete.selfward.app/delete-account
             </a>
             . When your account is deleted, your associated data is permanently

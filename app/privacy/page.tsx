@@ -1,194 +1,129 @@
 export default function PrivacyPage() {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#0B1020",
-        color: "#F8FAFC",
-        padding: "48px 20px 64px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div style={{ maxWidth: 760, margin: "0 auto" }}>
-        <h1
-          style={{
-            fontSize: "2.25rem",
-            fontWeight: 800,
-            marginBottom: 12,
-            lineHeight: 1.15,
-          }}
-        >
+    <main className="relative min-h-screen overflow-hidden bg-[#0B1220] text-white px-6 py-16">
+
+      {/* Background gradient (matches homepage + app) */}
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,#0B1220_0%,#1F3B68_55%,#0B1220_100%)]" />
+
+      {/* Soft ambient light */}
+      <div className="absolute top-0 left-1/2 h-[500px] w-[500px] -translate-x-1/2 bg-white/5 blur-3xl" />
+
+      <div className="relative z-10 mx-auto max-w-3xl">
+
+        {/* Logo */}
+        <div className="mb-12 flex justify-center">
+          <img
+            src="/selfward-logo.svg"
+            alt="Selfward"
+            className="h-16 opacity-95"
+          />
+        </div>
+
+        {/* Title */}
+        <h1 className="text-4xl font-black mb-2 text-center">
           Privacy Policy
         </h1>
 
-        <p
-          style={{
-            color: "#CBD5E1",
-            fontSize: "1rem",
-            lineHeight: 1.7,
-            marginBottom: 32,
-          }}
-        >
+        <p className="text-white/50 text-sm text-center mb-10">
           Effective Date: March 24, 2026
         </p>
 
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>Your privacy matters</h2>
-          <p style={bodyStyle}>
-            Selfward is built to support your personal growth, not to collect more
-            information than we need. We only use information that helps the app
-            work, personalize your experience, and improve reliability over time.
-          </p>
-        </section>
+        {/* Sections */}
+        <Section title="Your privacy matters">
+          Selfward is built to support your personal growth, not to collect more
+          information than we need. We only use information that helps the app
+          work, personalize your experience, and improve reliability over time.
+        </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>What we collect</h2>
-          <p style={bodyStyle}>
+        <Section title="What we collect">
+          <p>
             Depending on how you use Selfward, we may collect:
           </p>
-          <ul style={listStyle}>
-            <li style={listItemStyle}>
-              Account information, such as your email address
-            </li>
-            <li style={listItemStyle}>
-              Preferences you choose, like support styles, content types, and
-              focus areas
-            </li>
-            <li style={listItemStyle}>
-              Activity inside the app, such as content you play, save, or interact
-              with
-            </li>
-            <li style={listItemStyle}>
-              Notification settings and related device tokens, if you enable
-              notifications
-            </li>
+          <ul className="list-disc pl-5 space-y-2 mt-3">
+            <li>Account information, such as your email address</li>
+            <li>Preferences you choose, like support styles and focus areas</li>
+            <li>Activity inside the app, such as content you play or save</li>
+            <li>Notification settings and related device tokens</li>
           </ul>
-        </section>
+        </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>How we use your information</h2>
-          <p style={bodyStyle}>We use your information to:</p>
-          <ul style={listStyle}>
-            <li style={listItemStyle}>
-              Personalize affirmations, stories, meditations, and recommendations
-            </li>
-            <li style={listItemStyle}>
-              Save your preferences and progress
-            </li>
-            <li style={listItemStyle}>Keep the app working properly</li>
-            <li style={listItemStyle}>
-              Improve app performance and the overall user experience
-            </li>
-            <li style={listItemStyle}>
-              Send notifications you have chosen to receive
-            </li>
+        <Section title="How we use your information">
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Personalize your experience</li>
+            <li>Save your progress and preferences</li>
+            <li>Keep the app working properly</li>
+            <li>Improve performance and reliability</li>
+            <li>Send notifications you opt into</li>
           </ul>
-          <p style={bodyStyle}>We do not sell your personal information.</p>
-        </section>
 
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>Notifications</h2>
-          <p style={bodyStyle}>
-            If you turn on notifications, Selfward may send things like daily
-            boosts, reminders, or updates. You can turn notifications off at any
-            time in the app’s Settings.
+          <p className="mt-4 font-semibold text-white/90">
+            We do not sell your personal information.
           </p>
-        </section>
+        </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>How your data is stored</h2>
-          <p style={bodyStyle}>
-            We use trusted service providers and infrastructure tools to securely
-            store and process app data. We take reasonable steps to protect your
-            information, but no system can promise absolute security.
-          </p>
-        </section>
+        <Section title="Notifications">
+          If you enable notifications, Selfward may send daily boosts,
+          reminders, or updates. You can turn them off anytime in Settings.
+        </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>Deleting your account</h2>
-          <p style={bodyStyle}>
-            You can delete your account at any time. When you do, your account,
-            preferences, progress, and associated Selfward data are permanently
-            removed.
-          </p>
-          <p style={bodyStyle}>
-            You can manage account deletion in the app or here:{" "}
-            <a href="https://selfward.app/delete-account" style={linkStyle}>
+        <Section title="How your data is stored">
+          We use trusted infrastructure providers to securely store and process
+          data. While we take strong precautions, no system can guarantee
+          absolute security.
+        </Section>
+
+        <Section title="Deleting your account">
+          You can delete your account at any time. When you do, your data is
+          permanently removed.
+
+          <p className="mt-3">
+            Manage deletion here:{" "}
+            <a
+              href="https://selfward.app/delete-account"
+              className="text-orange-400 font-semibold hover:underline"
+            >
               selfward.app/delete-account
             </a>
           </p>
-        </section>
+        </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>Third-party services</h2>
-          <p style={bodyStyle}>
-            Selfward may rely on trusted third-party tools for things like hosting,
-            authentication, analytics, storage, and notifications. Those services
-            only receive the information necessary to do their job.
-          </p>
-        </section>
+        <Section title="Third-party services">
+          Selfward uses trusted providers for hosting, analytics, authentication,
+          and notifications. These services only receive the data required to
+          function.
+        </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>Changes to this policy</h2>
-          <p style={bodyStyle}>
-            We may update this Privacy Policy from time to time as Selfward grows
-            and improves. When we make meaningful changes, we’ll update the
-            effective date on this page.
-          </p>
-        </section>
+        <Section title="Changes to this policy">
+          We may update this policy over time. When we do, we will update the
+          effective date on this page.
+        </Section>
 
-        <section style={sectionStyle}>
-          <h2 style={headingStyle}>Contact</h2>
-          <p style={bodyStyle}>
-            If you have questions about this Privacy Policy, contact us at{" "}
-            <a href="mailto:hello@selfward.app" style={linkStyle}>
-              hello@selfward.app
-            </a>
-            .
-          </p>
-        </section>
+        <Section title="Contact">
+          Questions? Contact us at{" "}
+          <a
+            href="mailto:hello@selfward.app"
+            className="text-orange-400 font-semibold hover:underline"
+          >
+            hello@selfward.app
+          </a>
+        </Section>
+
+        {/* Footer */}
+        <div className="mt-16 text-center text-sm text-white/40">
+          © {new Date().getFullYear()} Selfward
+        </div>
       </div>
     </main>
   );
 }
 
-const sectionStyle = {
-  background:
-    "linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(17,24,39,0.95) 100%)",
-  border: "1px solid #1E293B",
-  borderRadius: 20,
-  padding: "28px 28px 24px",
-  marginBottom: 18,
-  boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
-};
-
-const headingStyle = {
-  fontSize: "1.35rem",
-  fontWeight: 800,
-  margin: "0 0 12px",
-  color: "#F8FAFC",
-};
-
-const bodyStyle = {
-  color: "#CBD5E1",
-  lineHeight: 1.75,
-  fontSize: "1rem",
-  margin: "0 0 14px",
-};
-
-const listStyle = {
-  color: "#CBD5E1",
-  paddingLeft: 22,
-  margin: "0 0 14px",
-  lineHeight: 1.75,
-};
-
-const listItemStyle = {
-  marginBottom: 8,
-};
-
-const linkStyle = {
-  color: "#93C5FD",
-  textDecoration: "none",
-  fontWeight: 700,
-};
+function Section({ title, children }: any) {
+  return (
+    <section className="mb-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 shadow-lg">
+      <h2 className="text-lg font-bold mb-3">{title}</h2>
+      <div className="text-white/70 leading-relaxed text-[15px]">
+        {children}
+      </div>
+    </section>
+  );
+}

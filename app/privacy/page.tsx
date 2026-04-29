@@ -11,11 +11,11 @@ export default function PrivacyPage() {
       <div className="relative z-10 mx-auto max-w-3xl">
 
         {/* Logo */}
-        <div className="mb-12 flex justify-center">
+        <div className="mb-8 flex justify-center">
           <img
             src="/selfward-logo.svg"
             alt="Selfward"
-            className="h-20 sm:h-24 opacity-90"
+            className="h-20 sm:h-22 opacity-90"
           />
         </div>
 

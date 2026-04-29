@@ -5,11 +5,11 @@ export default function TermsPage() {
       <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 bg-white/5 blur-3xl" />
 
       <div className="relative z-10 mx-auto max-w-3xl">
-        <div className="mb-12 flex justify-center">
+        <div className="mb-8 flex justify-center">
           <img
             src="/selfward-logo.svg"
             alt="Selfward"
-            className="h-20 sm:h-24 opacity-90"
+            className="h-20 sm:h-22 opacity-90"
           />
         </div>
 

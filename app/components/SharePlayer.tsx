@@ -28,15 +28,7 @@ export default function SharePlayer({
 
   const SHORT_AUDIO_THRESHOLD = 10;
 
-  const getDefaultPreviewStart = (type?: string | null) => {
-    switch (type) {
-      case "affirmation":
-      case "story":
-      case "meditation":
-      default:
-        return 0;
-    }
-  };
+  const getDefaultPreviewStart = () => 0;
 
   const getDefaultPreviewEnd = (type?: string | null) => {
     switch (type) {
@@ -54,7 +46,7 @@ export default function SharePlayer({
   const resolvedPreviewStart =
     typeof previewStartSec === "number"
       ? previewStartSec
-      : getDefaultPreviewStart(contentType);
+      : getDefaultPreviewStart();
 
   const resolvedPreviewEnd =
     typeof previewEndSec === "number"
@@ -128,9 +120,7 @@ export default function SharePlayer({
     posthog.capture("share_preview_completed", baseProps);
   };
 
-  const handleOpenInSelfward = (
-    e: React.MouseEvent<HTMLAnchorElement>
-  ) => {
+  const handleOpenInSelfward = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
     posthog.capture("share_open_in_selfward_clicked", {
@@ -140,11 +130,11 @@ export default function SharePlayer({
 
     setTimeout(() => {
       window.location.href = appDeepLink;
-    }, 800);
+    }, 500);
   };
 
   return (
-    <div className="mt-6 w-full flex flex-col items-center">
+    <div className="mt-7 flex w-full flex-col items-center">
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -154,29 +144,32 @@ export default function SharePlayer({
 
       <button
         onClick={handlePlayPause}
-        className="w-full max-w-sm rounded-full bg-emerald-500 py-4 text-black font-semibold text-lg"
+        className="w-full max-w-sm rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_16px_40px_rgba(249,115,22,0.28)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/70"
       >
         {isPlaying ? "Pause" : "Play"}
       </button>
 
-      <div className="mt-3 h-2 w-full max-w-sm bg-gray-700 rounded-full overflow-hidden">
+      <div className="mt-3 h-2 w-full max-w-sm overflow-hidden rounded-full bg-white/10">
         <div
-          className="h-full bg-emerald-400 transition-all"
+          className="h-full rounded-full bg-[#F97316] transition-all duration-300"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
 
       {showCTA && (
-        <div className="mt-6 w-full max-w-sm text-center">
-          <p className="text-lg font-semibold">Keep listening in Selfward</p>
-          <p className="text-sm text-gray-400 mt-1">
+        <div className="mt-7 w-full max-w-sm text-center">
+          <p className="text-lg font-black text-white">
+            Keep listening in Selfward
+          </p>
+
+          <p className="mt-1 text-sm font-medium leading-6 text-white/52">
             Get the full experience and personalized audio.
           </p>
 
           <a
             href={appDeepLink}
             onClick={handleOpenInSelfward}
-            className="block w-full mt-4 rounded-full bg-emerald-500 py-4 text-black font-semibold text-lg"
+            className="mt-5 block w-full rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_16px_40px_rgba(249,115,22,0.26)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/70"
           >
             Open in Selfward
           </a>
@@ -186,7 +179,7 @@ export default function SharePlayer({
             onClick={() =>
               posthog.capture("share_get_first_boost_clicked", baseProps)
             }
-            className="block mt-3 text-sm text-gray-400 underline"
+            className="mt-4 block text-sm font-bold text-orange-300/90 underline-offset-4 hover:text-orange-200 hover:underline"
           >
             Get your first boost
           </a>

@@ -9,7 +9,7 @@ export default function TermsPage() {
           <img
             src="/selfward-logo.svg"
             alt="Selfward"
-            className="h-16 opacity-95"
+            className="h-20 sm:h-24 opacity-90"
           />
         </div>
 

@@ -144,7 +144,7 @@ export default function SharePlayer({
 
       <button
         onClick={handlePlayPause}
-        className="w-full max-w-sm rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_16px_40px_rgba(249,115,22,0.28)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/70"
+        className="w-full max-w-sm rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_16px_40px_rgba(249,115,22,0.18)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/70"
       >
         {isPlaying ? "Pause" : "Play"}
       </button>
@@ -169,8 +169,7 @@ export default function SharePlayer({
           <a
             href={appDeepLink}
             onClick={handleOpenInSelfward}
-            className="mt-5 block w-full rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_16px_40px_rgba(249,115,22,0.26)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/70"
-          >
+            className="mt-5 block w-full rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_10px_26px_rgba(249,115,22,0.18)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/60"          >
             Open in Selfward
           </a>
 
@@ -179,8 +178,7 @@ export default function SharePlayer({
             onClick={() =>
               posthog.capture("share_get_first_boost_clicked", baseProps)
             }
-            className="mt-4 block text-sm font-bold text-orange-300/90 underline-offset-4 hover:text-orange-200 hover:underline"
-          >
+            className="mt-4 block text-sm font-bold text-white/58 underline-offset-4 transition hover:text-orange-200 hover:underline"          >
             Get your first boost
           </a>
         </div>

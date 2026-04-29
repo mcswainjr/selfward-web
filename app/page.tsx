@@ -21,22 +21,22 @@ export default function Home() {
 
       <section className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-16">
         <div className="mx-auto w-full max-w-3xl text-center">
-          <div className="relative mx-auto mb-12 flex justify-center">
-            <div className="absolute top-1/2 h-48 w-[480px] -translate-y-1/2 bg-[#FF6B3D]/10 blur-3xl" />
+          <div className="relative mx-auto mb-14 flex justify-center">
+            <div className="absolute top-1/2 h-48 w-[480px] -translate-y-1/2 bg-[#FF6B3D]/6 blur-3xl" />
 
             <img
               src="/selfward-logo.svg"
               alt="Selfward"
-              className="selfward-logo-float relative z-10 h-36 sm:h-40"
+              className="selfward-logo-float relative z-10 h-40 sm:h-44"
             />
           </div>
 
-          <p className="mx-auto mb-6 max-w-2xl text-2xl font-semibold leading-snug text-white sm:text-3xl">
+          <p className="mx-auto mb-6 max-w-2xl text-2xl font-semibold leading-snug text-white/95 sm:text-3xl">
             What you need to hear, when you need it most.
           </p>
 
           <p className="mx-auto mb-10 max-w-2xl text-base font-medium leading-8 text-white/60 sm:text-lg">
-            Personalized audio boosts based on how you’re feeling. Get a reset,
+            Personalized mindset boosts based on how you’re feeling. Get a reset,
             a push, or something grounding when the moment calls for it.
           </p>
 

@@ -2,28 +2,24 @@ export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050B16] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#1F3B68_0%,#0B1220_42%,#050B16_100%)]" />
-      <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-orange-500/10 blur-3xl" />
+      <div className="absolute -top-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[#FF6B3D]/10 blur-3xl" />
 
       <section className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-16">
         <div className="mx-auto w-full max-w-3xl text-center">
           <div className="relative mx-auto mb-7 flex justify-center">
-            <div className="absolute top-1/2 h-32 w-32 -translate-y-1/2 rounded-full bg-[#FF6B3D]/15 blur-3xl animate-pulse" />
-            <div className="absolute top-1/2 h-20 w-56 -translate-y-1/2 rounded-full bg-white/8 blur-2xl" />
+            <div className="absolute top-1/2 h-44 w-44 -translate-y-1/2 rounded-full bg-[#FF6B3D]/20 blur-3xl animate-pulse" />
+            <div className="absolute top-1/2 h-28 w-80 -translate-y-1/2 rounded-full bg-white/10 blur-2xl" />
 
             <img
               src="/selfward-logo.svg"
               alt="Selfward"
-              className="relative z-10 h-12 opacity-95 sm:h-14"
+              className="relative z-10 h-20 opacity-95 sm:h-24"
             />
           </div>
 
-          <p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-orange-300/90">
+          <p className="mb-5 text-xs font-black uppercase tracking-[0.28em] text-orange-300/90">
             Personalized audio for the moment you’re in
           </p>
-
-          <h1 className="mb-5 text-5xl font-black tracking-tight sm:text-6xl">
-            Selfward
-          </h1>
 
           <p className="mx-auto mb-6 max-w-2xl text-2xl font-semibold leading-snug text-white/88 sm:text-3xl">
             What you need to hear, when you need it most.

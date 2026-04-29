@@ -28,8 +28,6 @@ export default function SharePlayer({
 
   const SHORT_AUDIO_THRESHOLD = 10;
 
-  const getDefaultPreviewStart = () => 0;
-
   const getDefaultPreviewEnd = (type?: string | null) => {
     switch (type) {
       case "affirmation":
@@ -44,9 +42,7 @@ export default function SharePlayer({
   };
 
   const resolvedPreviewStart =
-    typeof previewStartSec === "number"
-      ? previewStartSec
-      : getDefaultPreviewStart();
+    typeof previewStartSec === "number" ? previewStartSec : 0;
 
   const resolvedPreviewEnd =
     typeof previewEndSec === "number"
@@ -144,7 +140,7 @@ export default function SharePlayer({
 
       <button
         onClick={handlePlayPause}
-        className="w-full max-w-sm rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_16px_40px_rgba(249,115,22,0.18)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/70"
+        className="w-full max-w-sm rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_10px_26px_rgba(249,115,22,0.18)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/60"
       >
         {isPlaying ? "Pause" : "Play"}
       </button>
@@ -159,7 +155,7 @@ export default function SharePlayer({
       {showCTA && (
         <div className="mt-7 w-full max-w-sm text-center">
           <p className="text-lg font-black text-white">
-            Keep listening in Selfward
+            Continue in Selfward
           </p>
 
           <p className="mt-1 text-sm font-medium leading-6 text-white/52">
@@ -169,8 +165,9 @@ export default function SharePlayer({
           <a
             href={appDeepLink}
             onClick={handleOpenInSelfward}
-            className="mt-5 block w-full rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_10px_26px_rgba(249,115,22,0.18)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/60"          >
-            Open in Selfward
+            className="mt-5 block w-full rounded-full bg-[#F97316]/95 py-4 text-base font-black text-white shadow-[0_8px_22px_rgba(249,115,22,0.18)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/60"
+          >
+            <span className="text-white">Open in Selfward</span>
           </a>
 
           <a
@@ -178,7 +175,8 @@ export default function SharePlayer({
             onClick={() =>
               posthog.capture("share_get_first_boost_clicked", baseProps)
             }
-            className="mt-4 block text-sm font-bold text-white/58 underline-offset-4 transition hover:text-orange-200 hover:underline"          >
+            className="mt-4 block text-sm font-semibold text-white/50 underline-offset-4 transition hover:text-orange-300 hover:underline"
+          >
             Get your first boost
           </a>
         </div>

@@ -141,7 +141,7 @@ export default function SharePlayer({
 
       <button
         onClick={handlePlayPause}
-        className="w-full max-w-sm rounded-full bg-[#F97316] py-4 text-base font-black text-white shadow-[0_10px_26px_rgba(249,115,22,0.18)] transition hover:-translate-y-0.5 hover:bg-[#fb8a3c] focus:outline-none focus:ring-2 focus:ring-orange-300/60"
+        className="w-full max-w-sm rounded-full border border-white/14 bg-white/[0.06] py-4 text-base font-black text-white transition hover:-translate-y-0.5 hover:bg-white/[0.09] focus:outline-none focus:ring-2 focus:ring-orange-300/60"
       >
         {isPlaying ? "Pause" : showCTA ? "Replay preview" : "Listen now"}
       </button>
@@ -167,8 +167,7 @@ export default function SharePlayer({
           </p>
 
           <p className="mt-1 text-sm font-medium leading-6 text-white/52">
-            You heard a short preview. Open Selfward to hear the full boost and keep what helped close.
-          </p>
+            You heard a short preview. Open Selfward to hear the full boost and carry it with you.          </p>
 
           <a
             href={appDeepLink}

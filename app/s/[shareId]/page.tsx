@@ -109,7 +109,6 @@ export default async function Page({ params }: PageProps) {
 
           <p className="mx-auto mb-7 max-w-sm text-sm font-medium leading-6 text-white/56">
             Take a moment to listen. If it resonates, Selfward can help you find what fits next.
-            in Selfward.
           </p>
 
           <div className="share-player-theme">

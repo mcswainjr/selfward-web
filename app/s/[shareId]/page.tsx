@@ -74,8 +74,8 @@ export default async function Page({ params }: PageProps) {
   const senderName = share?.sender_name_snapshot?.trim?.() || null;
 
   const heading = senderName
-    ? `${senderName} thought you needed to hear this.`
-    : "Someone thought you needed to hear this.";
+    ? `${senderName} thought of you when they heard this.`
+    : "Someone thought of you when they heard this.";
 
   const appDeepLink = `selfward://s/${shareId}`;
 
@@ -108,7 +108,7 @@ export default async function Page({ params }: PageProps) {
           </p>
 
           <p className="mx-auto mb-7 max-w-sm text-sm font-medium leading-6 text-white/56">
-            Listen for a moment. If it resonates, there’s more waiting for you
+            Take a moment to listen. If it resonates, Selfward can help you find what fits next.
             in Selfward.
           </p>
 
@@ -125,8 +125,7 @@ export default async function Page({ params }: PageProps) {
         </div>
 
         <p className="mx-auto mt-8 max-w-sm text-center text-sm leading-6 text-white/45">
-          Selfward gives you personalized mindset boosts based on how you’re
-          feeling, right when you need them.
+          Selfward helps you hear the words you need for the moment you're in.
         </p>
       </section>
 

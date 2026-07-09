@@ -21,12 +21,12 @@ export default function SharePlayer({
   previewEndSec,
 }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const hasReachedPreviewEndRef = useRef(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showCTA, setShowCTA] = useState(false);
 
-  const SHORT_AUDIO_THRESHOLD = 10;
 
   const getDefaultPreviewEnd = (type?: string | null) => {
     switch (type) {
@@ -73,9 +73,18 @@ export default function SharePlayer({
     }
 
     try {
-      if (safePreviewStart > 0 && audio.currentTime < safePreviewStart) {
+      const shouldRestartPreview =
+        showCTA ||
+        audio.currentTime < safePreviewStart ||
+        audio.currentTime >= safePreviewEnd;
+
+      if (shouldRestartPreview) {
         audio.currentTime = safePreviewStart;
+        setProgress(0);
+        setShowCTA(false);
       }
+
+      hasReachedPreviewEndRef.current = false;
 
       await audio.play();
       setIsPlaying(true);
@@ -99,13 +108,18 @@ export default function SharePlayer({
     setProgress(previewProgress);
 
     if (
-      audio.duration > SHORT_AUDIO_THRESHOLD &&
-      audio.currentTime >= safePreviewEnd
+      audio.currentTime >= safePreviewEnd &&
+      !hasReachedPreviewEndRef.current
     ) {
+      hasReachedPreviewEndRef.current = true;
+
       audio.pause();
+      audio.currentTime = safePreviewEnd;
+
       setIsPlaying(false);
       setShowCTA(true);
       setProgress(1);
+
       posthog.capture("share_preview_cutoff_reached", baseProps);
     }
   };
@@ -167,7 +181,7 @@ export default function SharePlayer({
           </p>
 
           <p className="mt-1 text-sm font-medium leading-6 text-white/52">
-            You heard a short preview. Open Selfward to hear the full boost and carry it with you.          </p>
+            You heard a short preview. Open Selfward to hear the full boost and carry it with you.</p>
 
           <a
             href={appDeepLink}

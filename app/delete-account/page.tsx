@@ -1,4 +1,5 @@
 export default function DeleteAccountPage() {
+<<<<<<< HEAD
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#0B1220] px-6 py-16 text-white">
       <div className="absolute inset-0 bg-[linear-gradient(180deg,#0B1220_0%,#1F3B68_55%,#0B1220_100%)]" />
@@ -72,4 +73,41 @@ function Section({ title, children }: any) {
       </div>
     </section>
   );
+=======
+    return (
+        <main style={{ padding: 24, maxWidth: 600, margin: "0 auto", lineHeight: 1.6 }}>
+            <h1>Delete Your Selfward Account</h1>
+
+            <p>
+                You can delete your Selfward account at any time directly in the app.
+            </p>
+
+            <h2>Steps to delete your account:</h2>
+            <ol>
+                <li>Open the Selfward app</li>
+                <li>Go to <strong>Settings</strong></li>
+                <li>Tap <strong>Delete Account</strong></li>
+                <li>Confirm deletion</li>
+            </ol>
+
+            <h2>What happens when you delete your account?</h2>
+            <ul>
+                <li>Your account is permanently deleted</li>
+                <li>Your preferences are removed</li>
+                <li>Your progress and activity are erased</li>
+            </ul>
+
+            <p>
+                This action cannot be undone.
+            </p>
+
+            <h2>Need help?</h2>
+            <p>
+                If you cannot access your account, contact us at:
+                <br />
+                <strong>support@selfward.app</strong>
+            </p>
+        </main>
+    );
+>>>>>>> a43dbe2 (Add delete account support page)
 }

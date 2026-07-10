@@ -2,25 +2,25 @@ import Link from "next/link";
 
 export default function ComingSoonPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#020617] to-[#020617] text-white flex items-center justify-center px-6">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#020617] to-[#020617] px-6 text-white">
       <div className="max-w-xl text-center">
-        <p className="text-xs tracking-widest text-gray-400 mb-4 uppercase">
+        <p className="mb-4 text-xs uppercase tracking-widest text-gray-400">
           Coming Soon
         </p>
 
-        <h1 className="text-4xl font-semibold tracking-tight mb-4">
+        <h1 className="mb-4 text-4xl font-semibold tracking-tight">
           Selfward is launching soon.
         </h1>
 
-        <p className="text-lg text-gray-300 mb-8">
-          Personalized audio boosts, right when you need them most.
+        <p className="mb-8 text-lg text-gray-300">
+          Personalized audio boosts and journeys are almost here.
         </p>
 
         <Link
           href="/"
-          className="inline-block bg-emerald-500 hover:bg-emerald-400 text-black font-semibold py-3 px-6 rounded-full transition"
+          className="inline-block rounded-full bg-[#F97316] px-6 py-3 font-black text-white shadow-lg shadow-orange-950/30 transition hover:-translate-y-0.5 hover:bg-[#fb8a3c]"
         >
-          Back to Home
+          Back to Selfward
         </Link>
       </div>
     </div>

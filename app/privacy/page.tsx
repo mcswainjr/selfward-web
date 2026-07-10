@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 export default function PrivacyPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#0B1220] text-white px-6 py-16">
@@ -117,7 +118,13 @@ export default function PrivacyPage() {
   );
 }
 
-function Section({ title, children }: any) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
   return (
     <section className="mb-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 shadow-lg">
       <h2 className="text-lg font-bold mb-3">{title}</h2>

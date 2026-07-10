@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function ComingSoonPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#020617] to-[#020617] text-white flex items-center justify-center px-6">
@@ -14,12 +16,12 @@ export default function ComingSoonPage() {
           Personalized audio boosts, right when you need them most.
         </p>
 
-        <a
+        <Link
           href="/"
           className="inline-block bg-emerald-500 hover:bg-emerald-400 text-black font-semibold py-3 px-6 rounded-full transition"
         >
           Back to Home
-        </a>
+        </Link>
       </div>
     </div>
   );

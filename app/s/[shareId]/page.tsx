@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SharePlayer from "../../components/SharePlayer";
 
 type PageProps = {
@@ -124,7 +125,7 @@ export default async function Page({ params }: PageProps) {
         </div>
 
         <p className="mx-auto mt-8 max-w-sm text-center text-sm leading-6 text-white/45">
-          Selfward helps you hear the words you need for the moment you're in.
+          Selfward helps you hear the words you need for the moment you&apos;re in.
         </p>
       </section>
 
@@ -183,12 +184,12 @@ function ErrorState({
           {message}
         </p>
 
-        <a
+        <Link
           href="/"
           className="mt-7 inline-flex rounded-full bg-[#F97316] px-6 py-3 text-sm font-black text-white transition hover:bg-[#fb8a3c]"
         >
           Go to Selfward
-        </a>
+        </Link>
       </div>
     </main>
   );

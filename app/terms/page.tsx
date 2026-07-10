@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 export default function TermsPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#0B1220] px-6 py-16 text-white">
@@ -100,7 +101,13 @@ export default function TermsPage() {
   );
 }
 
-function Section({ title, children }: any) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
   return (
     <section className="mb-5 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg backdrop-blur-md">
       <h2 className="mb-3 text-lg font-bold">{title}</h2>

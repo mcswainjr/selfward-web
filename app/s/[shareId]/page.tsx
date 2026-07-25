@@ -11,15 +11,15 @@ export default async function Page({ params }: PageProps) {
   const { shareId } = await params;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabasePublishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!supabaseUrl || !supabasePublishableKey) {
     return <ErrorState message="Missing Supabase environment variables." />;
   }
 
   const headers = {
-    apikey: supabaseAnonKey,
-    Authorization: `Bearer ${supabaseAnonKey}`,
+    apikey: supabasePublishableKey,
   };
 
   const shareRes = await fetch(

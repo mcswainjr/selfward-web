@@ -227,9 +227,25 @@ export default async function ContentOpsPage() {
                             </p>
                         </div>
 
-                        <div className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-bold text-white/50">
-                            {journeys.length}{" "}
-                            {journeys.length === 1 ? "Journey" : "Journeys"} in queue
+                        <div className="flex flex-wrap items-center gap-3">
+                            <Link
+                                href="/content-ops/boosts"
+                                className="inline-flex rounded-full border border-[#FFB59A]/30 bg-[#FFB59A]/10 px-5 py-2.5 text-sm font-black uppercase tracking-[0.18em] text-[#FFB59A] transition hover:bg-[#FFB59A]/15"
+                            >
+                                Open Boost Dashboard
+                            </Link>
+
+                            <Link
+                                href="/content-ops/new-journey"
+                                className="rounded-full bg-[#FFB59A] px-5 py-2.5 text-sm font-black text-[#0B1220] transition hover:bg-[#ffc5af]"
+                            >
+                                + Start New Journey
+                            </Link>
+
+                            <div className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-bold text-white/50">
+                                {journeys.length}{" "}
+                                {journeys.length === 1 ? "Journey" : "Journeys"} in queue
+                            </div>
                         </div>
                     </div>
                 </header>

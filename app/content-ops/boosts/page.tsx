@@ -364,14 +364,23 @@ export default async function BoostAdminPage({
                         </h1>
 
                         <p className="mt-4 max-w-3xl text-base font-semibold leading-8 text-white/60">
-                            Review what listeners hear across Daily Boost, Steady Growth,
-                            and Breakthrough Session. This version is read-only.
+                            Review listener coverage and manage Boosts through the
+                            creative production workflow.
                         </p>
                     </div>
 
-                    <Pill className="border-white/10 bg-white/5 text-white/60">
-                        Read only
-                    </Pill>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <Link
+                            href="/content-ops/boosts/new"
+                            className="rounded-full bg-[#FFB59A] px-5 py-2.5 text-sm font-black text-[#0B1220] transition hover:bg-[#ffc5af]"
+                        >
+                            + Start New Boost
+                        </Link>
+
+                        <Pill className="border-white/10 bg-white/5 text-white/60">
+                            Content Ops
+                        </Pill>
+                    </div>
                 </div>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">

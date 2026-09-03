@@ -55,6 +55,18 @@ type QueueRow = {
     admin_queue_status: string | null;
 };
 
+type CreativeBoostRow = {
+    id: string;
+    working_title: string;
+    boost_format: string | null;
+    trusted_voice: string | null;
+    status: string;
+    content_id: string | null;
+    voice_score: number | null;
+    curator_score: number | null;
+    created_at: string;
+};
+
 const experienceLabels: Record<string, string> = {
     daily_boost: "Daily Boost",
     steady_growth: "Steady Growth",
@@ -218,18 +230,26 @@ export default async function BoostAdminPage({
         gapResult,
         recipeResult,
         queueResult,
+        creativeResult,
     ] = await Promise.all([
         admin.from("admin_boost_playback_map_view").select("*"),
         admin.from("admin_boost_generation_gap_queue_view").select("*"),
         admin.from("admin_boost_recipe_coverage_view").select("*"),
         admin.from("admin_boost_queue_view").select("*"),
+        admin
+            .from("boosts")
+            .select(
+                "id, working_title, boost_format, trusted_voice, status, content_id, voice_score, curator_score, created_at"
+            )
+            .order("created_at", { ascending: false }),
     ]);
 
     const firstError =
         playbackResult.error ??
         gapResult.error ??
         recipeResult.error ??
-        queueResult.error;
+        queueResult.error ??
+        creativeResult.error;
 
     if (firstError) {
         console.error("Boost Admin Dashboard error:", firstError);
@@ -261,6 +281,7 @@ export default async function BoostAdminPage({
     const gapRows = (gapResult.data ?? []) as GapRow[];
     const recipeRows = (recipeResult.data ?? []) as RecipeRow[];
     const queueRows = (queueResult.data ?? []) as QueueRow[];
+    const creativeRows = (creativeResult.data ?? []) as CreativeBoostRow[];
 
     const uniqueFeelings = new Set(
         playbackRows
@@ -361,6 +382,73 @@ export default async function BoostAdminPage({
                     <StatCard label="Gap queue" value={gapRows.length} />
                     <StatCard label="Needs audio" value={needsAudioCount} />
                 </div>
+
+                <section className="mt-10 rounded-[32px] border border-white/10 bg-white/[0.03] p-5 sm:p-7">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <h2 className="text-2xl font-black">Creative Production</h2>
+                            <p className="mt-2 text-sm font-semibold text-white/50">
+                                Boosts moving through the new Architect → Writer → Voice Editor → Curator workflow.
+                            </p>
+                        </div>
+
+                        <Pill className="border-white/10 bg-white/5 text-white/60">
+                            {creativeRows.length} Boosts
+                        </Pill>
+                    </div>
+
+                    <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                        {creativeRows.map((boost) => (
+                            <Link
+                                key={boost.id}
+                                href={`/content-ops/boosts/${boost.id}`}
+                                className="rounded-[22px] border border-white/10 bg-[#0F1A2E] p-5 transition hover:border-[#FFB59A]/30 hover:bg-white/[0.05]"
+                            >
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                    <div>
+                                        <p className="font-black text-white">
+                                            {boost.working_title}
+                                        </p>
+
+                                        <p className="mt-1 text-sm font-semibold text-white/45">
+                                            {boost.trusted_voice ?? "No Trusted Voice"} ·{" "}
+                                            {boost.boost_format ?? "Unknown format"}
+                                        </p>
+                                    </div>
+
+                                    <Pill className="border-white/10 bg-white/5 text-white/50">
+                                        {boost.status.replaceAll("_", " ")}
+                                    </Pill>
+                                </div>
+
+                                <div className="mt-4 grid grid-cols-2 gap-2 text-xs font-bold text-white/45">
+                                    <p>
+                                        Voice:{" "}
+                                        {boost.voice_score != null
+                                            ? `${boost.voice_score}/10`
+                                            : "—"}
+                                    </p>
+
+                                    <p>
+                                        Curator:{" "}
+                                        {boost.curator_score != null
+                                            ? `${boost.curator_score}/100`
+                                            : "—"}
+                                    </p>
+
+                                    <p>
+                                        Content:{" "}
+                                        {boost.content_id ? "linked" : "not linked"}
+                                    </p>
+
+                                    <p className="text-[#FFB59A]">
+                                        Open production →
+                                    </p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </section>
 
                 <section className="mt-10 rounded-[32px] border border-white/10 bg-white/[0.03] p-5 sm:p-7">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

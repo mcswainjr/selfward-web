@@ -9,6 +9,7 @@ import BoostHumanApproval from "./BoostHumanApproval";
 import BoostRecordingScript from "./BoostRecordingScript";
 import BoostAudioPreview from "./BoostAudioPreview";
 import BoostRelease from "./BoostRelease";
+import BoostTitleEditor from "./BoostTitleEditor";
 
 type Boost = {
     id: string;
@@ -298,9 +299,11 @@ export default async function BoostProductionPage({
                             Selfward Content Ops
                         </p>
 
-                        <h1 className="mt-3 text-4xl font-black tracking-[-0.04em] sm:text-5xl">
-                            {boost.working_title}
-                        </h1>
+                        <BoostTitleEditor
+                            boostId={boost.id}
+                            workingTitle={boost.working_title}
+                            editable={!boost.content_id}
+                        />
 
                         <p className="mt-4 font-semibold text-white/50">
                             {boost.trusted_voice ?? "No Trusted Voice"} ·{" "}

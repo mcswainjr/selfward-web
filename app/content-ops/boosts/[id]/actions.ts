@@ -145,6 +145,88 @@ function revalidateBoost(boostId: string) {
     revalidatePath("/content-ops");
 }
 
+export async function updateBoostTitleFromContentOps(input: {
+    boostId: string;
+    workingTitle: string;
+}) {
+    const boostId = String(input?.boostId ?? "").trim();
+    const workingTitle = String(input?.workingTitle ?? "")
+        .trim()
+        .replace(/\s+/g, " ");
+
+    if (!boostId) {
+        throw new Error("Boost ID is required.");
+    }
+
+    if (workingTitle.length < 3) {
+        throw new Error(
+            "Boost title must be at least 3 characters."
+        );
+    }
+
+    if (workingTitle.length > 120) {
+        throw new Error(
+            "Boost title must be 120 characters or fewer."
+        );
+    }
+
+    const admin = await requireContentOpsAdmin();
+    const boost = await loadBoost(admin, boostId);
+
+    if (boost.content_id) {
+        throw new Error(
+            "Boost title is locked after playable content has been created."
+        );
+    }
+
+    if (
+        String(boost.working_title ?? "").trim() ===
+        workingTitle
+    ) {
+        return {
+            success: true,
+            workingTitle,
+        };
+    }
+
+    const {
+        data: updatedBoost,
+        error: updateError,
+    } = await admin
+        .from("boosts")
+        .update({
+            working_title: workingTitle,
+        })
+        .eq("id", boostId)
+        .is("content_id", null)
+        .select("id, working_title, content_id")
+        .maybeSingle();
+
+    if (updateError) {
+        console.error(
+            "Boost title update error:",
+            updateError
+        );
+
+        throw new Error(
+            "Unable to save the Boost title."
+        );
+    }
+
+    if (!updatedBoost) {
+        throw new Error(
+            "Boost title is no longer editable. Refresh the Boost and review its current production state."
+        );
+    }
+
+    revalidateBoost(boostId);
+
+    return {
+        success: true,
+        workingTitle: updatedBoost.working_title,
+    };
+}
+
 function resultForBoost(boost: any) {
     if (
         boost.status === "editor_approved" &&

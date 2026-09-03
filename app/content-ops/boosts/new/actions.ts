@@ -10,7 +10,20 @@ const BOOST_FORMATS = [
     "meditation",
 ] as const;
 
+const TRUSTED_VOICES = [
+    "Tiffany",
+    "Asher",
+    "Emma",
+    "Julius",
+    "Hope",
+    "Amina",
+    "Heracles",
+    "David",
+    "New Sworkit",
+] as const;
+
 type BoostFormat = (typeof BOOST_FORMATS)[number];
+type TrustedVoice = (typeof TRUSTED_VOICES)[number];
 
 async function requireContentOpsAdmin() {
     const supabase = await createClient();
@@ -115,6 +128,7 @@ export async function createBoostArchitectureFromContentOps(
     input: {
         mindsetFeelingSlug: string;
         boostFormat: string;
+        trustedVoice?: string;
         creativeDirection?: string;
     }
 ) {
@@ -124,6 +138,10 @@ export async function createBoostArchitectureFromContentOps(
 
     const boostFormat = String(
         input?.boostFormat ?? ""
+    ).trim();
+
+    const trustedVoice = String(
+        input?.trustedVoice ?? ""
     ).trim();
 
     const creativeDirection = String(
@@ -143,6 +161,17 @@ export async function createBoostArchitectureFromContentOps(
     ) {
         throw new Error(
             "Choose Affirmation, Story, or Meditation."
+        );
+    }
+
+    if (
+        trustedVoice &&
+        !TRUSTED_VOICES.includes(
+            trustedVoice as TrustedVoice
+        )
+    ) {
+        throw new Error(
+            "Choose a valid Trusted Voice or let the Architect choose."
         );
     }
 
@@ -192,6 +221,9 @@ export async function createBoostArchitectureFromContentOps(
                 boost_format:
                     boostFormat,
 
+                trusted_voice:
+                    trustedVoice || null,
+
                 creative_direction:
                     creativeDirection || null,
 
@@ -199,7 +231,7 @@ export async function createBoostArchitectureFromContentOps(
                     "production",
 
                 human_direction:
-                    `The founder intentionally selected the active mindset feeling "${feeling.name}" (${feeling.slug}) and Boost format "${boostFormat}". Treat both as fixed production constraints. Infer the strongest specific listener moment, title, Trusted Voice, target length, emotional job, core insight, and structure. Creative direction is optional context, not permission to change the selected feeling or format.`,
+                    `The founder intentionally selected the active mindset feeling "${feeling.name}" (${feeling.slug}) and Boost format "${boostFormat}". Treat both as fixed production constraints.${trustedVoice ? ` The founder also selected Trusted Voice "${trustedVoice}", which is a fixed production constraint.` : " The Trusted Voice was left open for the Architect to choose based on ownership of the central emotional insight."} Infer the strongest specific listener moment, title, target length, emotional job, core insight, and structure. Creative direction is optional context, not permission to change any fixed selection.`,
             },
         });
 

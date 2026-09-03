@@ -16,6 +16,18 @@ type BoostFormat =
     | "story"
     | "meditation";
 
+const trustedVoiceOptions = [
+    "Tiffany",
+    "Asher",
+    "Emma",
+    "Julius",
+    "Hope",
+    "Amina",
+    "Heracles",
+    "David",
+    "New Sworkit",
+] as const;
+
 const formatOptions: Array<{
     value: BoostFormat;
     label: string;
@@ -67,6 +79,11 @@ export default function NewBoostForm({
     ] = useState<BoostFormat>("affirmation");
 
     const [
+        trustedVoice,
+        setTrustedVoice,
+    ] = useState("");
+
+    const [
         creativeDirection,
         setCreativeDirection,
     ] = useState("");
@@ -109,6 +126,7 @@ export default function NewBoostForm({
                     await createBoostArchitectureFromContentOps({
                         mindsetFeelingSlug,
                         boostFormat,
+                        trustedVoice,
                         creativeDirection,
                     });
 
@@ -255,6 +273,51 @@ export default function NewBoostForm({
                 <div className="mb-6">
                     <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-200">
                         Step 3 · Optional
+                    </p>
+
+                    <h2 className="mt-2 text-xl font-bold text-white">
+                        Trusted Voice
+                    </h2>
+
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
+                        Choose a narrator when you already know
+                        who should own this Boost. Otherwise,
+                        let the Architect choose the voice that
+                        best owns the central emotional insight.
+                    </p>
+                </div>
+
+                <select
+                    value={trustedVoice}
+                    onChange={(event) =>
+                        setTrustedVoice(
+                            event.target.value
+                        )
+                    }
+                    disabled={isPending}
+                    className="w-full rounded-2xl border border-white/10 bg-[#0B1220] px-4 py-4 text-sm font-semibold text-white outline-none focus:border-orange-300/40"
+                >
+                    <option value="">
+                        Let the Architect choose
+                    </option>
+
+                    {trustedVoiceOptions.map(
+                        (voice) => (
+                            <option
+                                key={voice}
+                                value={voice}
+                            >
+                                {voice}
+                            </option>
+                        )
+                    )}
+                </select>
+            </section>
+
+            <section className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 sm:p-8">
+                <div className="mb-6">
+                    <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-200">
+                        Step 4 · Optional
                     </p>
 
                     <h2 className="mt-2 text-xl font-bold text-white">

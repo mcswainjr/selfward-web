@@ -51,11 +51,6 @@ export default function BoostFinalScriptEditor({
     function saveScript() {
         const normalizedScript = script.trim();
 
-        if (normalizedScript === finalScript.trim()) {
-            cancelEditing();
-            return;
-        }
-
         setError(null);
 
         startTransition(async () => {
@@ -105,9 +100,11 @@ export default function BoostFinalScriptEditor({
                 />
 
                 <p className="mt-3 text-sm font-semibold leading-6 text-white/40">
-                    Saving replaces only the authoritative final
-                    script. Writer and Voice Editor history remain
-                    unchanged.
+                    Saving changed wording does not preserve the
+                    current Voice Editor approval. The last
+                    Voice-Editor-approved script remains as history,
+                    and your new exact words move into Recording
+                    Rewrite review before Curator.
                 </p>
 
                 <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -122,7 +119,7 @@ export default function BoostFinalScriptEditor({
                     >
                         {isPending
                             ? "Saving..."
-                            : "Save Final Script"}
+                            : "Save & Require Voice Re-Review"}
                     </button>
 
                     <button

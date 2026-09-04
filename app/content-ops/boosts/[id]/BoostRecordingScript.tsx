@@ -29,9 +29,17 @@ export default function BoostRecordingScript({
 }: Props) {
     const router = useRouter();
 
-    const isRecordingRewriteRevision =
+    const hasRecordingRewriteCandidate =
         status === "revision_needed" &&
         Boolean(recordingScript?.trim());
+
+    const isRecordingRewriteAwaitingReview =
+        hasRecordingRewriteCandidate &&
+        !editorVerdict;
+
+    const isRecordingRewriteRevision =
+        hasRecordingRewriteCandidate &&
+        editorVerdict === "REVISION NEEDED";
 
     const hasSavedRecordingScript =
         Boolean(recordingScript?.trim());
@@ -72,7 +80,7 @@ export default function BoostRecordingScript({
     if (
         (
             status !== "human_approved" &&
-            !isRecordingRewriteRevision
+            !hasRecordingRewriteCandidate
         ) ||
         contentId ||
         !finalScript?.trim()
@@ -178,6 +186,23 @@ export default function BoostRecordingScript({
                     </div>
                 )}
             </div>
+
+            {isRecordingRewriteAwaitingReview && (
+                <div className="mt-6 rounded-[22px] border border-[#FFB59A]/25 bg-[#FFB59A]/[0.07] p-5">
+                    <p className="text-sm font-black text-[#FFD0BE]">
+                        Recording Rewrite Awaiting Voice Review
+                    </p>
+
+                    <p className="mt-2 text-sm font-semibold leading-6 text-white/55">
+                        The human-final wording changed after
+                        Voice Editor approval. The previous
+                        approval is no longer current. These
+                        exact saved words must be reviewed by
+                        the assigned Trusted Voice Editor before
+                        Curator can continue.
+                    </p>
+                </div>
+            )}
 
             {isRecordingRewriteRevision && (
                 <div className="mt-6 rounded-[22px] border border-amber-300/25 bg-amber-300/[0.07] p-5">

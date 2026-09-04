@@ -269,12 +269,50 @@ export async function updateBoostFinalScriptFromContentOps(input: {
         );
     }
 
-    if (boost.final_script.trim() === finalScript) {
+    const currentFinalScript =
+        boost.final_script.trim();
+
+    const currentRecordingScript =
+        typeof boost.recording_script === "string"
+            ? boost.recording_script.trim()
+            : "";
+
+    /*
+      Repair legacy approval mismatches created before this
+      boundary existed.
+
+      In that state:
+      - final_script contains a later human edit
+      - recording_script still contains the last Voice-Editor-
+        approved wording
+
+      Preserve that approved recording copy as the historical
+      final script while moving the human wording back into the
+      recording-rewrite review path.
+    */
+    const staleApprovalMismatch =
+        Boolean(currentRecordingScript) &&
+        currentRecordingScript !== currentFinalScript &&
+        finalScript === currentFinalScript;
+
+    if (
+        finalScript === currentFinalScript &&
+        !staleApprovalMismatch
+    ) {
         return {
             success: true,
-            finalScript,
+            finalScript: currentFinalScript,
+            recordingScript:
+                currentRecordingScript || null,
+            status: boost.status,
+            requiresVoiceReview: false,
         };
     }
+
+    const lastVoiceEditorApprovedScript =
+        staleApprovalMismatch
+            ? currentRecordingScript
+            : currentFinalScript;
 
     const {
         data: updatedBoost,
@@ -282,14 +320,37 @@ export async function updateBoostFinalScriptFromContentOps(input: {
     } = await admin
         .from("boosts")
         .update({
-            final_script: finalScript,
+            /*
+              final_script remains the last wording actually
+              approved by the Trusted Voice Editor.
+
+              The human's new exact words become the explicit
+              recording-rewrite candidate.
+            */
+            final_script:
+                lastVoiceEditorApprovedScript,
+            recording_script: finalScript,
+
+            /*
+              A substantive human edit invalidates the current
+              creative approval state before Curator can run.
+            */
+            editor_verdict: null,
+            voice_score: null,
+            editor_notes: null,
+            recording_notes: null,
+            curator_score: null,
+            curator_action: null,
+            curator_reason: null,
+            status: "revision_needed",
+            updated_at: new Date().toISOString(),
         })
         .eq("id", boostId)
         .eq("status", "editor_approved")
         .is("curator_action", null)
         .is("content_id", null)
         .select(
-            "id, status, final_script, curator_action, content_id"
+            "id, status, final_script, recording_script, editor_verdict, curator_action, content_id"
         )
         .maybeSingle();
 
@@ -315,6 +376,10 @@ export async function updateBoostFinalScriptFromContentOps(input: {
     return {
         success: true,
         finalScript: updatedBoost.final_script,
+        recordingScript:
+            updatedBoost.recording_script,
+        status: updatedBoost.status,
+        requiresVoiceReview: true,
     };
 }
 

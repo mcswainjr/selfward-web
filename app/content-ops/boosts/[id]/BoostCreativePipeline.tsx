@@ -17,6 +17,7 @@ type Props = {
     editorNotes: string | null;
     curatorAction: string | null;
     revisionCount: number | null;
+    recordingScript: string | null;
     contentId: string | null;
 };
 
@@ -46,6 +47,7 @@ export default function BoostCreativePipeline({
     editorNotes,
     curatorAction,
     revisionCount,
+    recordingScript,
     contentId,
 }: Props) {
     const router = useRouter();
@@ -75,6 +77,20 @@ export default function BoostCreativePipeline({
     if (
         status === "revision_needed" &&
         curatorAction
+    ) {
+        return null;
+    }
+
+    /*
+      A saved recording_script means this revision belongs to the
+      post-recording human rewrite path.
+
+      Do not expose the ordinary Writer revision controls here.
+      Editing and re-review live in the Recording Script panel.
+    */
+    if (
+        status === "revision_needed" &&
+        recordingScript?.trim()
     ) {
         return null;
     }

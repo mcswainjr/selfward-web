@@ -384,6 +384,7 @@ export default async function BoostProductionPage({
                     editorNotes={boost.editor_notes}
                     curatorAction={boost.curator_action}
                     revisionCount={boost.revision_count}
+                    recordingScript={boost.recording_script}
                     contentId={boost.content_id}
                 />
 
@@ -411,6 +412,8 @@ export default async function BoostProductionPage({
                     status={boost.status}
                     finalScript={boost.final_script}
                     recordingScript={boost.recording_script}
+                    editorVerdict={boost.editor_verdict}
+                    editorNotes={boost.editor_notes}
                     contentId={boost.content_id}
                 />
 

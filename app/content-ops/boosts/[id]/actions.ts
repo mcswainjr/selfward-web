@@ -984,6 +984,52 @@ export async function approveBoostForRecordingFromContentOps(input: {
 
 
 
+export async function reviewBoostRecordingRewriteFromContentOps(input: {
+    boostId: string;
+}) {
+    const boostId = String(input?.boostId ?? "").trim();
+
+    if (!boostId) {
+        throw new Error("Missing Boost.");
+    }
+
+    const admin = await requireContentOpsAdmin();
+    let boost = await loadBoost(admin, boostId);
+
+    if (boost.content_id) {
+        throw new Error(
+            "This Boost already has playable content connected. Recording rewrite review is locked."
+        );
+    }
+
+    if (!boost.recording_script?.trim()) {
+        throw new Error(
+            "Save the recording rewrite before sending it for review."
+        );
+    }
+
+    if (
+        boost.status !== "human_approved" &&
+        boost.status !== "revision_needed"
+    ) {
+        throw new Error(
+            `Recording rewrite review is not available at Boost status ${boost.status}.`
+        );
+    }
+
+    await callCreativeOrchestratorFromContentOps({
+        action: "review_boost_recording_rewrite",
+        boost_id: boostId,
+    });
+
+    boost = await loadBoost(admin, boostId);
+
+    revalidateBoost(boostId);
+
+    return resultForBoost(boost);
+}
+
+
 export async function saveBoostRecordingScript(formData: FormData) {
     const boostId = String(
         formData.get("boost_id") ?? ""
@@ -1042,7 +1088,14 @@ export async function saveBoostRecordingScript(formData: FormData) {
 
       Creative approval history remains unchanged.
     */
-    if (boost.status !== "human_approved") {
+    const isRecordingRewriteRevision =
+        boost.status === "revision_needed" &&
+        Boolean(boost.recording_script?.trim());
+
+    if (
+        boost.status !== "human_approved" &&
+        !isRecordingRewriteRevision
+    ) {
         throw new Error(
             `Recording script is locked at Boost status ${
                 boost.status ?? "unknown"
@@ -1072,7 +1125,13 @@ export async function saveBoostRecordingScript(formData: FormData) {
                 recordingScript,
         })
         .eq("id", boostId)
-        .eq("status", "human_approved")
+        .in(
+            "status",
+            [
+                "human_approved",
+                "revision_needed",
+            ]
+        )
         .is("content_id", null)
         .select(
             "id, status, content_id, recording_script"
@@ -1097,8 +1156,10 @@ export async function saveBoostRecordingScript(formData: FormData) {
     }
 
     if (
-        updatedBoost.status !==
-            "human_approved" ||
+        ![
+            "human_approved",
+            "revision_needed",
+        ].includes(updatedBoost.status) ||
         updatedBoost.content_id
     ) {
         throw new Error(

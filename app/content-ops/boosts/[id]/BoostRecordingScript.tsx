@@ -77,6 +77,19 @@ export default function BoostRecordingScript({
         setDraft(startingScript);
     }, [startingScript]);
 
+    /*
+      router.refresh() preserves this client component's local
+      state. When a human-final edit invalidates the previous
+      Voice Editor approval, clear any stale review result so
+      the UI reflects the new awaiting-review server state.
+    */
+    useEffect(() => {
+        if (!isRecordingRewriteAwaitingReview) return;
+
+        setReviewMessage(null);
+        setReviewError(null);
+    }, [isRecordingRewriteAwaitingReview]);
+
     if (
         (
             status !== "human_approved" &&

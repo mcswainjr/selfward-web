@@ -10,6 +10,7 @@ import BoostRecordingScript from "./BoostRecordingScript";
 import BoostAudioPreview from "./BoostAudioPreview";
 import BoostRelease from "./BoostRelease";
 import BoostTitleEditor from "./BoostTitleEditor";
+import BoostFinalScriptEditor from "./BoostFinalScriptEditor";
 
 type Boost = {
     id: string;
@@ -493,10 +494,22 @@ export default async function BoostProductionPage({
                     </div>
 
                     <div className="mt-6 space-y-5">
-                        <ScriptPanel
-                            label="Final approved script"
-                            script={boost.final_script}
-                        />
+                        {boost.final_script ? (
+                            <BoostFinalScriptEditor
+                                boostId={boost.id}
+                                finalScript={boost.final_script}
+                                editable={
+                                    boost.status === "editor_approved" &&
+                                    !boost.curator_action &&
+                                    !boost.content_id
+                                }
+                            />
+                        ) : (
+                            <ScriptPanel
+                                label="Final approved script"
+                                script={boost.final_script}
+                            />
+                        )}
 
                         {boost.revised_script &&
                         boost.revised_script !== boost.final_script ? (

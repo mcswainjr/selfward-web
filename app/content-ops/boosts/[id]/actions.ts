@@ -227,6 +227,97 @@ export async function updateBoostTitleFromContentOps(input: {
     };
 }
 
+export async function updateBoostFinalScriptFromContentOps(input: {
+    boostId: string;
+    finalScript: string;
+}) {
+    const boostId = String(input?.boostId ?? "").trim();
+    const finalScript = String(input?.finalScript ?? "").trim();
+
+    if (!boostId) {
+        throw new Error("Boost ID is required.");
+    }
+
+    if (!finalScript) {
+        throw new Error(
+            "Final script cannot be empty."
+        );
+    }
+
+    if (finalScript.length > 12000) {
+        throw new Error(
+            "Final script is too long to save."
+        );
+    }
+
+    const admin = await requireContentOpsAdmin();
+    const boost = await loadBoost(admin, boostId);
+
+    if (
+        boost.status !== "editor_approved" ||
+        boost.curator_action ||
+        boost.content_id
+    ) {
+        throw new Error(
+            "Final script is editable only after Voice Editor approval and before Curator review."
+        );
+    }
+
+    if (!boost.final_script?.trim()) {
+        throw new Error(
+            "This Boost does not contain an approved final script."
+        );
+    }
+
+    if (boost.final_script.trim() === finalScript) {
+        return {
+            success: true,
+            finalScript,
+        };
+    }
+
+    const {
+        data: updatedBoost,
+        error: updateError,
+    } = await admin
+        .from("boosts")
+        .update({
+            final_script: finalScript,
+        })
+        .eq("id", boostId)
+        .eq("status", "editor_approved")
+        .is("curator_action", null)
+        .is("content_id", null)
+        .select(
+            "id, status, final_script, curator_action, content_id"
+        )
+        .maybeSingle();
+
+    if (updateError) {
+        console.error(
+            "Boost final script update error:",
+            updateError
+        );
+
+        throw new Error(
+            "Unable to save the final Boost script."
+        );
+    }
+
+    if (!updatedBoost) {
+        throw new Error(
+            "Final script is no longer editable. Refresh the Boost and review its current production state."
+        );
+    }
+
+    revalidateBoost(boostId);
+
+    return {
+        success: true,
+        finalScript: updatedBoost.final_script,
+    };
+}
+
 function resultForBoost(boost: any) {
     if (
         boost.status === "editor_approved" &&

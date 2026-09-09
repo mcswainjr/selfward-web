@@ -3,11 +3,13 @@ import type { ReactNode } from "react";
 export default function DeleteAccountPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#0B1220] px-6 py-16 text-white">
+      {/* Background gradient */}
       <div className="absolute inset-0 bg-[linear-gradient(180deg,#0B1220_0%,#1F3B68_55%,#0B1220_100%)]" />
 
       <div className="absolute top-0 left-1/2 h-[500px] w-[500px] -translate-x-1/2 bg-white/5 blur-3xl" />
 
       <div className="relative z-10 mx-auto max-w-3xl">
+        {/* Logo */}
         <div className="mb-8 flex justify-center">
           <img
             src="/selfward-logo.svg"
@@ -105,6 +107,7 @@ export default function DeleteAccountPage() {
           </p>
         </Section>
 
+        {/* Footer */}
         <div className="mt-16 text-center text-sm text-white/40">
           © {new Date().getFullYear()} Selfward
         </div>

@@ -2,8 +2,16 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import { createClient } from "../../../../lib/supabase/server";
-import { saveRecordingScript } from "./actions";
+import {
+    approveJourneyForRecordingFromContentOps,
+    editApprovedJourneyScript,
+    saveRecordingScript,
+} from "./actions";
+import JourneyAudioUploader from "./JourneyAudioUploader";
+import JourneyImageUploader from "./JourneyImageUploader";
+import JourneyCreativePipeline from "./JourneyCreativePipeline";
 import LegacyAudioConnector from "./LegacyAudioConnector";
+
 
 type Journey = {
     id: string;
@@ -23,8 +31,12 @@ type JourneyStep = {
     step_number: number;
     title: string;
     status: string;
+    script_draft: string | null;
     final_script: string | null;
     recording_script: string | null;
+    editor_verdict: string | null;
+    editor_notes: string | null;
+    revision_count: number | null;
     content_id: string | null;
 };
 
@@ -32,6 +44,17 @@ type ContentRecord = {
     id: string;
     audio_url: string | null;
     duration_seconds: number | null;
+};
+
+type CuratorSlateItem = {
+    id: string;
+    weekly_slate_id: string;
+    journey_step_id: string | null;
+    rank: number | null;
+    score: number | null;
+    curator_action: string | null;
+    curator_reason: string | null;
+    human_decision: string | null;
 };
 
 function StatusCheck({
@@ -163,8 +186,12 @@ export default async function JourneyProductionPage({
         step_number,
         title,
         status,
+        script_draft,
         final_script,
         recording_script,
+        editor_verdict,
+        editor_notes,
+        revision_count,
         content_id
       `
         )
@@ -177,6 +204,95 @@ export default async function JourneyProductionPage({
     }
 
     const steps = (stepData ?? []) as JourneyStep[];
+
+    /*
+      Load the current Curator recommendation, if this Journey
+      is waiting at the human production-approval gate.
+
+      This query is read-only. It does not run the Curator and
+      does not approve the Journey.
+    */
+    const {
+        data: curatorItemData,
+        error: curatorItemError,
+    } = await admin
+        .from("weekly_slate_items")
+        .select(
+            `
+        id,
+        weekly_slate_id,
+        journey_step_id,
+        rank,
+        score,
+        curator_action,
+        curator_reason,
+        human_decision
+      `
+        )
+        .eq("journey_id", id)
+        .is("human_decision", null)
+        .order("rank", { ascending: true });
+
+    if (curatorItemError) {
+        console.error(
+            "Journey Curator review load error:",
+            curatorItemError
+        );
+
+        throw new Error(
+            "Unable to load Journey Curator review."
+        );
+    }
+
+    const curatorItems =
+        (curatorItemData ?? []) as CuratorSlateItem[];
+
+    const curatorReview =
+        curatorItems[0] ?? null;
+
+    const curatorPackageItems =
+        curatorReview
+            ? curatorItems.filter(
+                  (item) =>
+                      item.weekly_slate_id ===
+                      curatorReview.weekly_slate_id
+              )
+            : [];
+
+    const recordingApprovalCuratorActions =
+        new Set([
+            "APPROVE FOR RECORDING",
+            "APPROVE AFTER MICRO-EDITS",
+        ]);
+
+    const canApproveJourneyForRecording =
+        Boolean(curatorReview) &&
+        journey.pipeline_purpose ===
+            "production" &&
+        !journey.is_active &&
+        journey.status ===
+            "coherence_approved" &&
+        curatorPackageItems.length ===
+            journey.num_days &&
+        curatorPackageItems.every(
+            (item) =>
+                recordingApprovalCuratorActions.has(
+                    item.curator_action ?? ""
+                )
+        ) &&
+        steps.length === journey.num_days &&
+        steps.every(
+            (step) =>
+                step.status ===
+                    "pending_human_approval" &&
+                Boolean(
+                    step.final_script?.trim()
+                ) &&
+                Boolean(
+                    step.recording_script?.trim()
+                ) &&
+                !step.content_id
+        );
 
     /*
       Load attached playable content only when a step has content_id.
@@ -283,6 +399,181 @@ export default async function JourneyProductionPage({
                     </div>
                 </section>
 
+                {journey.pipeline_purpose === "production" &&
+                    !journey.is_active &&
+                    ["architected", "in_production", "coherence_approved"].includes(journey.status) && (
+                        <JourneyCreativePipeline
+                            journeyId={journey.id}
+                            journeyStatus={journey.status}
+                            steps={steps.map((step) => ({
+                                id: step.id,
+                                stepNumber: step.step_number,
+                                status: step.status,
+                                scriptDraft: step.script_draft,
+                                editorVerdict: step.editor_verdict,
+                                editorNotes: step.editor_notes,
+                                revisionCount: step.revision_count,
+                            }))}
+                        />
+                    )}
+
+                {curatorReview && (
+                    <section className="mt-8 rounded-[28px] border border-white/10 bg-white/[0.05] p-6 sm:p-7">
+                        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                            <div className="max-w-3xl">
+                                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#FFB59A]">
+                                    Human Review
+                                </p>
+
+                                <h2 className="mt-2 text-xl font-black text-white">
+                                    Curator Review
+                                </h2>
+
+                                <p className="mt-2 text-sm font-semibold leading-6 text-white/45">
+                                    The Curator has reviewed the complete Journey
+                                    package. No final human approval has been made.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-wrap gap-3 lg:justify-end">
+                                {typeof curatorReview.score === "number" && (
+                                    <div className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-black text-white/75">
+                                        {curatorReview.score}/100
+                                    </div>
+                                )}
+
+                                <div className="rounded-full border border-amber-300/25 bg-amber-300/10 px-4 py-2 text-sm font-black text-amber-200">
+                                    {curatorReview.curator_action ===
+                                    "APPROVE AFTER MICRO-EDITS"
+                                        ? "Approve after micro-edits"
+                                        : curatorReview.curator_action ===
+                                            "APPROVE FOR RECORDING"
+                                          ? "Approve for recording"
+                                          : curatorReview.curator_action
+                                                ?.toLowerCase()
+                                                .replaceAll("_", " ") ??
+                                            "Curator review complete"}
+                                </div>
+                            </div>
+                        </div>
+
+                        {curatorReview.curator_reason && (
+                            <div className="mt-6 rounded-[22px] border border-white/10 bg-[#0B1220]/60 p-5">
+                                <p className="text-xs font-black uppercase tracking-[0.14em] text-white/35">
+                                    Curator recommendation
+                                </p>
+
+                                <p className="mt-3 text-sm font-semibold leading-7 text-white/70">
+                                    {curatorReview.curator_reason}
+                                </p>
+                            </div>
+                        )}
+
+                        {curatorReview.curator_action ===
+                            "APPROVE AFTER MICRO-EDITS" && (
+                            <div className="mt-5 rounded-[22px] border border-amber-300/20 bg-amber-300/[0.06] p-5">
+                                <p className="text-sm font-black text-amber-200">
+                                    Production polish requested
+                                </p>
+
+                                <p className="mt-2 text-sm font-semibold leading-6 text-white/55">
+                                    Make only the small production edits you agree
+                                    with before final recording approval. This
+                                    recommendation does not reopen the Journey's
+                                    architecture, coherence review, or Trusted
+                                    Voice assignment.
+                                </p>
+                            </div>
+                        )}
+
+                        {canApproveJourneyForRecording && curatorReview && (
+                            <div className="mt-6 rounded-[22px] border border-emerald-300/20 bg-emerald-300/[0.06] p-5">
+                                <p className="text-sm font-black text-emerald-200">
+                                    Final human production decision
+                                </p>
+
+                                <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-white/55">
+                                    Approving this Journey marks all {journey.num_days} Days
+                                    human approved and unlocks the recording stage. It does
+                                    not publish, release, or make the Journey live.
+                                </p>
+
+                                <form
+                                    action={
+                                        approveJourneyForRecordingFromContentOps
+                                    }
+                                    className="mt-4"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="journey_id"
+                                        value={journey.id}
+                                    />
+
+                                    <input
+                                        type="hidden"
+                                        name="weekly_slate_item_id"
+                                        value={curatorReview.id}
+                                    />
+
+                                    <button
+                                        type="submit"
+                                        className="inline-flex rounded-full bg-emerald-300 px-5 py-3 text-sm font-black text-[#0B1220] transition hover:bg-emerald-200"
+                                    >
+                                        Approve Journey for Recording
+                                    </button>
+                                </form>
+                            </div>
+                        )}
+
+                        <div className="mt-5 flex flex-col gap-2 border-t border-white/10 pt-5 text-sm font-semibold text-white/45 sm:flex-row sm:items-center sm:justify-between">
+                            <p>
+                                {curatorPackageItems.length} Day
+                                {curatorPackageItems.length === 1 ? "" : "s"} in
+                                this Curator package
+                            </p>
+
+                            <p className="font-bold text-white/60">
+                                One Journey · one human approval decision
+                            </p>
+                        </div>
+                    </section>
+                )}
+
+                <section className="mt-10">
+                    <div className="mb-5">
+                        <p className="text-xs font-black uppercase tracking-[0.18em] text-[#FFB59A]">
+                            Creative Assets
+                        </p>
+
+                        <h2 className="mt-2 text-2xl font-black tracking-[-0.03em]">
+                            Journey Artwork
+                        </h2>
+
+                        <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-white/45">
+                            Upload and connect the final production artwork for this Journey.
+                            Images are locked here once connected.
+                        </p>
+                    </div>
+
+                    <div className="grid gap-5">
+                        <JourneyImageUploader
+                            journeyId={journey.id}
+                            assetType="cover"
+                            currentUrl={
+                                journey.cover_image_url?.trim() || null
+                            }
+                        />
+
+                        <JourneyImageUploader
+                            journeyId={journey.id}
+                            assetType="hero"
+                            currentUrl={
+                                journey.hero_image_url?.trim() || null
+                            }
+                        />
+                    </div>
+                </section>
                 <div className="mt-10 space-y-6">
                     {steps.map((step) => {
                         const content = step.content_id
@@ -365,9 +656,50 @@ export default async function JourneyProductionPage({
                                         </p>
 
                                         {step.final_script?.trim() ? (
-                                            <div className="mt-4 whitespace-pre-wrap text-sm font-semibold leading-7 text-white/70">
-                                                {step.final_script}
-                                            </div>
+                                            step.status === "editor_approved" &&
+                                            journey.pipeline_purpose === "production" &&
+                                            !journey.is_active &&
+                                            !recordingScriptReady &&
+                                            !step.content_id ? (
+                                                <form
+                                                    action={editApprovedJourneyScript}
+                                                    className="mt-4"
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="journey_id"
+                                                        value={journey.id}
+                                                    />
+
+                                                    <input
+                                                        type="hidden"
+                                                        name="step_id"
+                                                        value={step.id}
+                                                    />
+
+                                                    <textarea
+                                                        name="approved_script"
+                                                        defaultValue={step.final_script}
+                                                        rows={18}
+                                                        className="w-full resize-y rounded-2xl border border-white/10 bg-[#0B1220]/70 px-4 py-4 text-sm font-semibold leading-7 text-white/80 outline-none transition focus:border-[#FFB59A]/60"
+                                                    />
+
+                                                    <p className="mt-3 text-xs font-bold leading-5 text-white/35">
+                                                        You can make final human edits here until a Recording Script is saved.
+                                                    </p>
+
+                                                    <button
+                                                        type="submit"
+                                                        className="mt-4 inline-flex rounded-full bg-[#FFB59A] px-5 py-2.5 text-sm font-black text-[#0B1220] transition hover:bg-[#ffc5af]"
+                                                    >
+                                                        Save Approved Script
+                                                    </button>
+                                                </form>
+                                            ) : (
+                                                <div className="mt-4 whitespace-pre-wrap text-sm font-semibold leading-7 text-white/70">
+                                                    {step.final_script}
+                                                </div>
+                                            )
                                         ) : (
                                             <p className="mt-4 text-sm font-semibold text-white/35">
                                                 No approved script stored.
@@ -433,6 +765,21 @@ export default async function JourneyProductionPage({
                                             stepId={step.id}
                                             storageObjectName={legacyStorageObjectName}
                                             audioUrl={legacyAudioUrl}
+                                        />
+                                    )}
+
+                                {journey.pipeline_purpose === "production" &&
+                                    (journey.status === "in_production" ||
+                                        journey.status === "coherence_approved") &&
+                                    !journey.is_active &&
+                                    step.status === "human_approved" &&
+                                    finalScriptReady &&
+                                    recordingScriptReady &&
+                                    !step.content_id &&
+                                    !legacyStorageObjectName && (
+                                        <JourneyAudioUploader
+                                            journeyId={journey.id}
+                                            stepId={step.id}
                                         />
                                     )}
 

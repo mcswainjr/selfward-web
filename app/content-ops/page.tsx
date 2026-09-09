@@ -2,6 +2,23 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "../../lib/supabase/admin";
 import { createClient } from "../../lib/supabase/server";
+import {
+    FeaturedJourneyButton,
+    FeaturedOrderControls,
+    PriorityJourneySlot,
+    ReleaseJourneyButton,
+} from "./JourneyDashboardControls";
+
+type LiveJourney = {
+    id: string;
+    title: string;
+    trusted_voice: string | null;
+    num_days: number | null;
+    is_featured: boolean | null;
+    featured_order: number | null;
+    featured_title: string | null;
+    priority: number | null;
+};
 
 type JourneyAction = {
     journey_id: string;
@@ -167,6 +184,63 @@ export default async function ContentOpsPage() {
     }
 
     const journeys = (data ?? []) as JourneyAction[];
+
+    const { data: liveData, error: liveError } = await admin
+        .from("journeys")
+        .select(
+            `
+id,
+title,
+trusted_voice,
+num_days,
+is_featured,
+featured_order,
+featured_title,
+priority
+        `
+        )
+        .eq("pipeline_purpose", "production")
+        .eq("status", "published")
+        .eq("is_active", true)
+        .order("is_featured", { ascending: false })
+        .order("featured_order", { ascending: true })
+        .order("title", { ascending: true });
+
+    if (liveError) {
+        console.error(
+            "Content Ops live Journey query error:",
+            liveError
+        );
+    }
+
+    const liveJourneys = (liveData ?? []) as LiveJourney[];
+
+    const featuredJourneyCount = liveJourneys.filter(
+        (journey) => Boolean(journey.is_featured)
+    ).length;
+
+    const priorityJourneyOptions = [...liveJourneys]
+        .sort((a, b) => a.title.localeCompare(b.title))
+        .map((journey) => ({
+            id: journey.id,
+            title: journey.title,
+            priority: journey.priority,
+        }));
+
+    const prioritySlots = [1, 2, 3, 4, 5].map(
+        (position) => {
+            const currentJourney =
+                liveJourneys.find(
+                    (journey) =>
+                        journey.priority === position
+                ) ?? null;
+
+            return {
+                position,
+                currentJourney,
+            };
+        }
+    );
 
     const stageOrder: Record<string, number> = {
         "Needs My Review": 1,
@@ -341,15 +415,27 @@ export default async function ContentOpsPage() {
 
                                                     <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                                         <p className="text-base font-black text-white/85">
-                                                            {journey.next_action}
+                                                            {journey.founder_stage === "Ready for Release"
+                                                                ? "Ready to go live"
+                                                                : journey.next_action}
                                                         </p>
 
-                                                        <Link
-                                                            href={`/content-ops/journeys/${journey.journey_id}`}
-                                                            className="inline-flex w-fit items-center rounded-full border border-white/10 bg-white/[0.07] px-5 py-2.5 text-sm font-black text-white transition hover:bg-white/[0.12]"
-                                                        >
-                                                            Open Journey →
-                                                        </Link>
+                                                        <div className="flex flex-wrap items-center gap-3">
+                                                            {journey.founder_stage === "Ready for Release" &&
+                                                                journey.ready_for_release && (
+                                                                    <ReleaseJourneyButton
+                                                                        journeyId={journey.journey_id}
+                                                                        title={journey.title}
+                                                                    />
+                                                                )}
+
+                                                            <Link
+                                                                href={`/content-ops/journeys/${journey.journey_id}`}
+                                                                className="inline-flex w-fit items-center rounded-full border border-white/10 bg-white/[0.07] px-5 py-2.5 text-sm font-black text-white transition hover:bg-white/[0.12]"
+                                                            >
+                                                                Open Journey →
+                                                            </Link>
+                                                        </div>
                                                     </div>
 
                                                     {journey.data_check !== "OK" && (
@@ -366,6 +452,149 @@ export default async function ContentOpsPage() {
                         })}
                     </div>
                 )}
+
+                <section className="mt-14 border-t border-white/10 pt-10">
+                    <div className="mb-5">
+                        <h2 className="text-sm font-black uppercase tracking-[0.18em] text-white/65">
+                            Priority Journeys
+                        </h2>
+
+                        <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-white/40">
+                            Choose the five Journeys that appear first in the main Journey catalog.
+                            Everything else continues through normal discovery ordering.
+                        </p>
+                    </div>
+
+                    <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 sm:p-6">
+                        <div className="grid gap-3">
+                            {prioritySlots.map(
+                                ({ position, currentJourney }) => (
+                                    <PriorityJourneySlot
+                                        key={position}
+                                        position={position}
+                                        currentJourneyId={
+                                            currentJourney?.id ?? null
+                                        }
+                                        currentJourneyTitle={
+                                            currentJourney?.title ?? null
+                                        }
+                                        options={priorityJourneyOptions}
+                                    />
+                                )
+                            )}
+                        </div>
+                    </div>
+                </section>
+
+                <section className="mt-14 border-t border-white/10 pt-10">
+                    <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <h2 className="text-sm font-black uppercase tracking-[0.18em] text-white/65">
+                                Live Journeys
+                            </h2>
+
+                            <p className="mt-2 text-sm font-semibold text-white/40">
+                                Manage Featured placement for Journeys already available to listeners.
+                            </p>
+                        </div>
+
+                        <span className="w-fit rounded-full bg-white/[0.07] px-3 py-1 text-xs font-black text-white/45">
+                            {liveJourneys.length} Live
+                        </span>
+                    </div>
+
+                    {liveJourneys.length === 0 ? (
+                        <div className="rounded-[24px] border border-white/10 bg-white/[0.04] p-6">
+                            <p className="font-bold text-white/45">
+                                No production Journeys are currently live.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4">
+                            {liveJourneys.map((journey) => {
+                                const isFeatured = Boolean(
+                                    journey.is_featured
+                                );
+
+                                return (
+                                    <article
+                                        key={journey.id}
+                                        className="rounded-[24px] border border-white/10 bg-white/[0.04] p-5 sm:p-6"
+                                    >
+                                        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                                            <div className="min-w-0">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-black text-emerald-200">
+                                                        Live
+                                                    </span>
+
+                                                    {isFeatured && (
+                                                        <span className="rounded-full border border-orange-400/20 bg-orange-400/10 px-3 py-1 text-xs font-black text-orange-200">
+                                                            Featured · Position{" "}
+                                                            {journey.featured_order ?? 0}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <h3 className="mt-3 text-xl font-black tracking-[-0.02em]">
+                                                    {journey.title}
+                                                </h3>
+
+                                                <p className="mt-1 text-sm font-bold text-white/40">
+                                                    {journey.trusted_voice ??
+                                                        "Voice not assigned"}
+                                                    {" · "}
+                                                    {journey.num_days ?? "—"}{" "}
+                                                    {journey.num_days === 1
+                                                        ? "day"
+                                                        : "days"}
+                                                </p>
+
+                                                {isFeatured &&
+                                                    journey.featured_title && (
+                                                        <p className="mt-2 text-sm font-semibold text-white/45">
+                                                            Featured title:{" "}
+                                                            {journey.featured_title}
+                                                        </p>
+                                                    )}
+                                            </div>
+
+                                            <div className="flex flex-wrap items-center gap-3">
+                                                {isFeatured && (
+                                                    <FeaturedOrderControls
+                                                        journeyId={journey.id}
+                                                        title={journey.title}
+                                                        position={journey.featured_order ?? 0}
+                                                        isFirst={
+                                                            journey.featured_order === 1
+                                                        }
+                                                        isLast={
+                                                            journey.featured_order ===
+                                                            featuredJourneyCount
+                                                        }
+                                                    />
+                                                )}
+
+                                                <FeaturedJourneyButton
+                                                    journeyId={journey.id}
+                                                    title={journey.title}
+                                                    isFeatured={isFeatured}
+                                                />
+
+                                                <Link
+                                                    href={`/content-ops/journeys/${journey.id}`}
+                                                    className="inline-flex rounded-full border border-white/10 bg-white/[0.07] px-4 py-2 text-sm font-black text-white transition hover:bg-white/[0.12]"
+                                                >
+                                                    Open →
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </article>
+                                );
+                            })}
+                        </div>
+                    )}
+                </section>
             </section>
         </main>
     );

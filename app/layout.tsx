@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://selfward.app"),
   title: "Selfward",
   description: "What you need to hear, when you need it most.",
 };

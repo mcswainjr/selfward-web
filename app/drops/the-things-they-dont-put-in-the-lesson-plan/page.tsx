@@ -4,7 +4,7 @@ import DropPlayer from "./DropPlayer";
 import DropSelfwardCTA from "./DropSelfwardCTA";
 
 const AUDIO_URL =
-  "https://jjzabogmmbzrikomyctt.supabase.co/storage/v1/object/public/drops/apparently-everyone-needs-something.mp3";
+  "https://jjzabogmmbzrikomyctt.supabase.co/storage/v1/object/public/drops/apparently-everyone-needs-something-2.mp3";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://selfward.app"),

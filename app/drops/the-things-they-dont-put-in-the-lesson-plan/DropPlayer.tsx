@@ -38,7 +38,7 @@ export default function DropPlayer({ audioUrl }: Props) {
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(217);
+  const [duration, setDuration] = useState(258);
   const [showShare, setShowShare] = useState(false);
   const [shareStatus, setShareStatus] = useState("");
 
@@ -104,7 +104,7 @@ export default function DropPlayer({ audioUrl }: Props) {
       if (!audio) return;
 
       const amount = details.seekOffset ?? 15;
-      const knownDuration = getAudioDuration(audio) || 217;
+      const knownDuration = getAudioDuration(audio) || 258;
       const nextTime = Math.min(audio.currentTime + amount, knownDuration);
 
       audio.currentTime = nextTime;
@@ -115,7 +115,7 @@ export default function DropPlayer({ audioUrl }: Props) {
       const audio = audioRef.current;
       if (!audio || typeof details.seekTime !== "number") return;
 
-      const knownDuration = getAudioDuration(audio) || 217;
+      const knownDuration = getAudioDuration(audio) || 258;
       const nextTime = Math.min(
         Math.max(details.seekTime, 0),
         knownDuration

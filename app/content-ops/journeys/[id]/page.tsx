@@ -772,7 +772,9 @@ export default async function JourneyProductionPage({
                                     (journey.status === "in_production" ||
                                         journey.status === "coherence_approved") &&
                                     !journey.is_active &&
-                                    step.status === "human_approved" &&
+                                    (step.status === "human_approved" ||
+                                        (journey.status === "coherence_approved" &&
+                                            step.status === "editor_approved")) &&
                                     finalScriptReady &&
                                     recordingScriptReady &&
                                     !step.content_id &&

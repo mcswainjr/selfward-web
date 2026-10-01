@@ -304,9 +304,14 @@ async function getNewProductionAudioTarget(
         );
     }
 
-    if (step.status !== "human_approved") {
+    const stepApprovedForAudio =
+        step.status === "human_approved" ||
+        (journey.status === "coherence_approved" &&
+            step.status === "editor_approved");
+
+    if (!stepApprovedForAudio) {
         throw new Error(
-            `New production audio requires a human-approved Journey step. Current status: ${step.status}.`
+            `New production audio requires a human-approved Journey step or an editor-approved step in a coherence-approved Journey. Current step status: ${step.status}; Journey status: ${journey.status}.`
         );
     }
 

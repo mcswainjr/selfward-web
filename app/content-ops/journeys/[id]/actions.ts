@@ -2004,6 +2004,103 @@ export async function reviewJourneyCoherenceFromContentOps(input: {
     };
 }
 
+export async function curateJourneyForRecordingFromContentOps(
+    formData: FormData
+) {
+    const journeyId = String(
+        formData.get("journey_id") ?? ""
+    ).trim();
+
+    if (!journeyId) {
+        throw new Error("Missing Journey.");
+    }
+
+    const admin = await requireContentOpsAdmin();
+
+    const {
+        data: journey,
+        error: journeyError,
+    } = await admin
+        .from("journeys")
+        .select(
+            "id,status,is_active,pipeline_purpose"
+        )
+        .eq("id", journeyId)
+        .maybeSingle();
+
+    if (journeyError || !journey) {
+        throw new Error(
+            "Unable to verify the Journey."
+        );
+    }
+
+    if (
+        journey.pipeline_purpose !==
+        "production"
+    ) {
+        throw new Error(
+            "Only production Journeys can run Curator review."
+        );
+    }
+
+    if (journey.is_active) {
+        throw new Error(
+            "A live Journey cannot enter Curator review."
+        );
+    }
+
+    if (
+        journey.status !==
+        "coherence_approved"
+    ) {
+        throw new Error(
+            `Journey is not ready for Curator review. Current status: ${journey.status}.`
+        );
+    }
+
+    /*
+      The Journey-specific Curator backend requires
+      a technical week_start. Use the current UTC
+      Monday. The Journey review itself receives a
+      unique technical slate title in the orchestrator.
+    */
+    const now = new Date();
+
+    const differenceFromMonday =
+        now.getUTCDay() === 0
+            ? -6
+            : 1 - now.getUTCDay();
+
+    const monday = new Date(
+        Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate() +
+                differenceFromMonday
+        )
+    );
+
+    const weekStart =
+        monday.toISOString().slice(0, 10);
+
+    await callCreativeOrchestratorFromContentOps({
+        action:
+            "curate_journey_for_recording",
+        journey_id: journeyId,
+        week_start: weekStart,
+    });
+
+    revalidatePath(
+        `/content-ops/journeys/${journeyId}`
+    );
+    revalidatePath("/content-ops");
+
+    redirect(
+        `/content-ops/journeys/${journeyId}?curatorReviewed=1`
+    );
+}
+
+
 export async function approveJourneyForRecordingFromContentOps(
     formData: FormData
 ) {

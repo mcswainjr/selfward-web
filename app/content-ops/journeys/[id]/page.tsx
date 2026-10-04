@@ -4,6 +4,7 @@ import { createAdminClient } from "../../../../lib/supabase/admin";
 import { createClient } from "../../../../lib/supabase/server";
 import {
     approveJourneyForRecordingFromContentOps,
+    curateJourneyForRecordingFromContentOps,
     editApprovedJourneyScript,
     saveRecordingScript,
 } from "./actions";
@@ -265,6 +266,27 @@ export default async function JourneyProductionPage({
             "APPROVE AFTER MICRO-EDITS",
         ]);
 
+    const canRunJourneyCurator =
+        journey.pipeline_purpose ===
+            "production" &&
+        !journey.is_active &&
+        journey.status ===
+            "coherence_approved" &&
+        !curatorReview &&
+        steps.length === journey.num_days &&
+        steps.every(
+            (step) =>
+                step.status ===
+                    "editor_approved" &&
+                Boolean(
+                    step.final_script?.trim()
+                ) &&
+                Boolean(
+                    step.recording_script?.trim()
+                ) &&
+                !step.content_id
+        );
+
     const canApproveJourneyForRecording =
         Boolean(curatorReview) &&
         journey.pipeline_purpose ===
@@ -416,6 +438,50 @@ export default async function JourneyProductionPage({
                             }))}
                         />
                     )}
+
+                {canRunJourneyCurator && (
+                    <section className="mt-8 rounded-[28px] border border-white/10 bg-white/[0.05] p-6 sm:p-7">
+                        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                            <div className="max-w-3xl">
+                                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#FFB59A]">
+                                    Curator Review
+                                </p>
+
+                                <h2 className="mt-2 text-xl font-black text-white">
+                                    Ready for Curator
+                                </h2>
+
+                                <p className="mt-2 text-sm font-semibold leading-6 text-white/45">
+                                    The complete Journey has passed coherence review and
+                                    all Recording Scripts are ready. Curator will review
+                                    the Journey package for recording readiness. This does
+                                    not human-approve, create audio, publish, or release
+                                    the Journey.
+                                </p>
+                            </div>
+
+                            <form
+                                action={
+                                    curateJourneyForRecordingFromContentOps
+                                }
+                                className="shrink-0"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="journey_id"
+                                    value={journey.id}
+                                />
+
+                                <button
+                                    type="submit"
+                                    className="rounded-full bg-[#FFB59A] px-5 py-3 text-sm font-black text-[#0B1220] transition hover:bg-[#ffc5af]"
+                                >
+                                    Review with Curator
+                                </button>
+                            </form>
+                        </div>
+                    </section>
+                )}
 
                 {curatorReview && (
                     <section className="mt-8 rounded-[28px] border border-white/10 bg-white/[0.05] p-6 sm:p-7">

@@ -30,6 +30,38 @@ async function requireContentOpsAdmin() {
     return createAdminClient();
 }
 
+export async function finalizeJourneyForReleaseFromContentOps(input: {
+    journeyId: string;
+}) {
+    const journeyId = String(input?.journeyId ?? "").trim();
+
+    if (!journeyId) {
+        throw new Error("Missing Journey.");
+    }
+
+    const admin = await requireContentOpsAdmin();
+
+    const { data, error } = await admin.rpc(
+        "finalize_journey_for_release",
+        {
+            p_journey_id: journeyId,
+        }
+    );
+
+    if (error) {
+        console.error("Journey finalization error:", error);
+        throw new Error(error.message);
+    }
+
+    revalidatePath("/content-ops");
+    revalidatePath(`/content-ops/journeys/${journeyId}`);
+
+    return {
+        success: true,
+        result: data,
+    };
+}
+
 export async function releaseJourneyFromContentOps(input: {
     journeyId: string;
 }) {

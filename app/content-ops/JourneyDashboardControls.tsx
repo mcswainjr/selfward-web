@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+    finalizeJourneyForReleaseFromContentOps,
     moveFeaturedJourneyFromContentOps,
     releaseJourneyFromContentOps,
     setJourneyFeaturedFromContentOps,
@@ -13,6 +14,65 @@ type BaseProps = {
     journeyId: string;
     title: string;
 };
+
+export function FinalizeJourneyButton({
+    journeyId,
+    title,
+}: BaseProps) {
+    const router = useRouter();
+    const [busy, setBusy] = useState(false);
+    const [errorMessage, setErrorMessage] =
+        useState<string | null>(null);
+
+    async function handleFinalize() {
+        const confirmed = window.confirm(
+            `Finalize “${title}” for release?\n\nThis completes the production package and moves the Journey to Ready for Release. It will NOT make the Journey live.`
+        );
+
+        if (!confirmed) return;
+
+        setBusy(true);
+        setErrorMessage(null);
+
+        try {
+            await finalizeJourneyForReleaseFromContentOps({
+                journeyId,
+            });
+
+            router.refresh();
+        } catch (error) {
+            setErrorMessage(
+                error instanceof Error
+                    ? error.message
+                    : "Unable to finalize this Journey for release."
+            );
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    return (
+        <div>
+            <button
+                type="button"
+                onClick={handleFinalize}
+                disabled={busy}
+                className="inline-flex rounded-full bg-[#F97316] px-5 py-2.5 text-sm font-black text-white transition hover:bg-[#fb8a3c] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+                {busy
+                    ? "Finalizing…"
+                    : "Finalize for Release"}
+            </button>
+
+            {errorMessage && (
+                <p className="mt-2 max-w-sm text-sm font-bold text-red-200">
+                    {errorMessage}
+                </p>
+            )}
+        </div>
+    );
+}
+
 
 export function ReleaseJourneyButton({
     journeyId,

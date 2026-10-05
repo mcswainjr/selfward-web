@@ -5,6 +5,7 @@ import { createClient } from "../../lib/supabase/server";
 import {
     FeaturedJourneyButton,
     FeaturedOrderControls,
+    FinalizeJourneyButton,
     PriorityJourneySlot,
     ReleaseJourneyButton,
 } from "./JourneyDashboardControls";
@@ -421,6 +422,13 @@ priority
                                                         </p>
 
                                                         <div className="flex flex-wrap items-center gap-3">
+                                                            {journey.next_action === "Finalize for release" && (
+                                                                <FinalizeJourneyButton
+                                                                    journeyId={journey.journey_id}
+                                                                    title={journey.title}
+                                                                />
+                                                            )}
+
                                                             {journey.founder_stage === "Ready for Release" &&
                                                                 journey.ready_for_release && (
                                                                     <ReleaseJourneyButton

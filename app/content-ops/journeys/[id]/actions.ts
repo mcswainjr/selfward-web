@@ -400,7 +400,7 @@ export async function createJourneyAudioUploadTicket(input: {
         .createSignedUploadUrl(
             storageObjectName,
             {
-                upsert: false,
+                upsert: true,
             }
         );
 
